@@ -1,0 +1,83 @@
+name: Actualizar seguimiento y publicar web
+
+# Corre cada día hábil después del cierre de EE. UU. (16:00 hora de Nueva York):
+# 21:30 UTC = 17:30 en horario de verano / 16:30 en invierno. El minuto 30 evita el pico
+# de carga que GitHub tiene al comienzo de cada hora.
+on:
+  schedule:
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:            # botón "Run workflow" en la pestaña Actions
+  push:
+    branches: [main]
+    paths:
+      - "recomendaciones.csv"
+      - "seguimiento_danelfin.py"
+      - "requirements.txt"
+      - "web/**"
+      - ".github/workflows/actualizar.yml"
+
+# contents: commitear data/cierres.csv · pages + id-token: desplegar en GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Una sola corrida a la vez; si hay otra en curso, espera (no la cancela a mitad del despliegue).
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      # Baja precios (yfinance; Massive de respaldo), evalúa stop loss / take profit y genera
+      # el Excel (web/descargas/) y los datos de la web (web/data/datos.js).
+      # Si falla, los pasos siguientes no corren y el sitio publicado no cambia.
+      - name: Generar Excel y datos de la web
+        env:
+          MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
+        run: python seguimiento_danelfin.py
+
+      # data/cierres.csv guarda los cierres de la última rueda. El commit diario mantiene
+      # actividad en el repo (GitHub apaga los cron de repos públicos tras 60 días sin actividad).
+      # En feriados no hay datos nuevos y no se commitea nada.
+      - name: Commitear los cierres del día
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/cierres.csv
+          if git diff --staged --quiet; then
+            echo "Sin datos nuevos: no hay nada que commitear."
+          else
+            git commit -m "chore: cierres $(date -u +%Y-%m-%d)"
+            git pull --rebase --autostash origin main || true
+            git push
+          fi
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v6
+
+      - name: Subir el sitio
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: web
+
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

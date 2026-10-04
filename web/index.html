@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TP IA · ¿Acertó Danelfin?</title>
+<meta name="description" content="Seguimiento de las recomendaciones BUY de Danelfin AI: stop loss, take profit, rendimiento real y comparación con el S&P 500.">
+<script>
+/* Tema antes del primer pintado: elección guardada o preferencia del sistema (con try/catch: file:// puede bloquear el almacenamiento) */
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('tema'); } catch (e) {}
+  if (t !== 'light' && t !== 'dark') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<!--
+THESIS: la IA se juzga con los mismos 12 gráficos a la misma escala; un informe de evidencia, no un tablero de trading ni una landing.
+OWN-WORLD: claro/oscuro con tinta azul marino sobre gris azulado; azul = Real, ámbar = Hold, gris punteado = SPY; verde/rojo solo para ganancia/pérdida, siempre con signo y flecha; Source Serif 4 para texto, Atkinson Hyperlegible para cifras.
+STORY: el lector entiende qué se midió (reglas de Danelfin), ve que 0 de 12 ganaron y 8 tocaron el stop, y puede abrir cada caso para verificarlo.
+FIRST VIEWPORT: encabezado con botón de descarga y tema; título "¿Acertó Danelfin?"; fila de 4 cifras grandes (real, hold, stops, vs S&P 500).
+FORM: sitio de una página con secciones ancladas, small multiples + tablas ordenables; datos de data/datos.js.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#resumen">TP IA · Danelfin<span>Sistema Financiero Internacional</span></a>
+    <nav class="site-nav" aria-label="Secciones">
+      <a href="#resumen">Resumen</a>
+      <a href="#danelfin">Danelfin</a>
+      <a href="#resultados">Resultados</a>
+      <a href="#indicadores">Indicadores</a>
+      <a href="#metodologia">Metodología</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn btn-primary" id="descarga" href="descargas/Seguimiento_Danelfin_IA.xlsx" download>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
+        <span>Descargar Excel <small id="descarga-meta"></small></span>
+      </a>
+      <button class="btn icon-btn" id="tema" type="button" aria-label="Cambiar entre tema claro y oscuro" title="Tema claro / oscuro">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <section id="resumen" class="hero" aria-labelledby="h-resumen">
+    <div class="wrap">
+      <p class="eyebrow">Trabajo práctico · IA aplicada a inversiones</p>
+      <h1 id="h-resumen">¿Acertó Danelfin?</h1>
+      <p class="lede" id="lede">Cargando datos…</p>
+      <div class="kpis" id="kpis" role="list"></div>
+      <div class="readout">
+        <div>
+          <h3>Lectura automática</h3>
+          <ul class="facts" id="facts"></ul>
+        </div>
+        <div id="equipo-bloque" hidden>
+          <h3>Interpretación del equipo</h3>
+          <div class="prose team-note" id="conclusiones"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="danelfin" aria-labelledby="h-danelfin">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Contexto</p>
+        <h2 id="h-danelfin">Qué es Danelfin</h2>
+      </div>
+      <div class="prose" id="danelfin-texto"></div>
+      <div class="table-wrap" id="promesa-wrap"></div>
+    </div>
+  </section>
+
+  <section id="resultados" aria-labelledby="h-resultados">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Evidencia</p>
+        <h2 id="h-resultados">Las recomendaciones, una por una</h2>
+        <p>Cada ficha usa el mismo criterio: entrada, stop loss y take profit del mail de Danelfin. La ✕ marca el día en que se tocó el stop. Hacé clic en una ficha para ver el detalle diario.</p>
+      </div>
+      <div class="controls">
+        <div class="group"><span class="lbl" id="lbl-metrica">Mostrar</span>
+          <div class="seg" role="group" aria-labelledby="lbl-metrica">
+            <button type="button" data-metrica="real" aria-pressed="true">Real (con SL/TP)</button>
+            <button type="button" data-metrica="hold" aria-pressed="false">Hold (sin SL/TP)</button>
+          </div></div>
+        <div class="group"><span class="lbl" id="lbl-estado">Estado</span>
+          <div class="seg" role="group" aria-labelledby="lbl-estado" id="filtros">
+            <button type="button" data-filtro="todas" aria-pressed="true">Todas</button>
+            <button type="button" data-filtro="abierta" aria-pressed="false">Abiertas</button>
+            <button type="button" data-filtro="stop" aria-pressed="false">Stop loss</button>
+            <button type="button" data-filtro="take" aria-pressed="false">Take profit</button>
+          </div></div>
+        <div class="group"><label class="lbl" for="orden">Ordenar por</label>
+          <select id="orden">
+            <option value="fecha">Fecha de recomendación</option>
+            <option value="mejor">Rendimiento (mejor primero)</option>
+            <option value="peor">Rendimiento (peor primero)</option>
+            <option value="ticker">Ticker (A–Z)</option>
+          </select></div>
+        <span class="count" id="cuenta" aria-live="polite"></span>
+      </div>
+      <div class="grid" id="grid"></div>
+
+      <div class="panels">
+        <div class="panel">
+          <h3>Real vs hold por acción</h3>
+          <p class="sub">Rendimiento desde la entrada de Danelfin hasta la salida (real) o hasta hoy (hold).</p>
+          <div class="legend"><span><i class="sq" style="background:var(--real)"></i>Real</span><span><i class="sq" style="background:var(--hold)"></i>Hold</span></div>
+          <div class="chart-box"><canvas id="ch-barras" role="img" aria-label="Rendimiento real y hold por acción; los mismos valores están en la tabla de abajo"></canvas></div>
+        </div>
+        <div class="panel">
+          <h3>Evolución semanal promedio</h3>
+          <p class="sub">Promedio de las posiciones ya recomendadas en cada viernes, contra el S&amp;P 500 en la misma ventana. Cada semana se suman acciones nuevas, así que la composición cambia.</p>
+          <div class="legend"><span><i style="border-color:var(--real)"></i>Real</span><span><i class="dash" style="border-color:var(--hold)"></i>Hold</span><span><i class="dot" style="border-color:var(--spy)"></i>S&amp;P 500 (SPY)</span></div>
+          <div class="chart-box"><canvas id="ch-semanal" role="img" aria-label="Evolución semanal del rendimiento promedio real, hold y del S&P 500"></canvas></div>
+        </div>
+      </div>
+
+      <div class="table-wrap" id="tabla-wrap"></div>
+    </div>
+  </section>
+
+  <section id="indicadores" aria-labelledby="h-indicadores">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Contraste</p>
+        <h2 id="h-indicadores">Indicadores técnicos y benchmark</h2>
+        <p>¿Las acciones que perdieron ya mostraban debilidad técnica cuando Danelfin dijo BUY? Lectura con el cierre previo a la entrada. Con tan pocos casos es descriptivo, no estadístico.</p>
+      </div>
+      <div class="table-wrap flush" id="ind-entrada-wrap"></div>
+
+      <div class="controls" style="margin-top:2rem">
+        <div class="group"><label class="lbl" for="ind-ticker">Evolución de</label>
+          <select id="ind-ticker"></select></div>
+      </div>
+      <div class="table-wrap flush" id="ind-evol-wrap"></div>
+
+      <div class="panels">
+        <div class="panel">
+          <h3>Alpha contra el S&amp;P 500</h3>
+          <p class="sub">Rendimiento real de la acción menos el del SPY en la misma ventana. Positivo: superó al mercado.</p>
+          <div class="chart-box"><canvas id="ch-alpha" role="img" aria-label="Alpha real de cada acción contra el S&P 500"></canvas></div>
+        </div>
+        <div class="panel" id="bench-panel">
+          <h3>Acción vs SPY</h3>
+          <p class="sub">Mismos datos del gráfico, en cifras.</p>
+          <div class="table-wrap flush" id="bench-wrap" style="margin-top:0"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="metodologia" aria-labelledby="h-metodologia">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Cómo medimos</p>
+        <h2 id="h-metodologia">Metodología y supuestos</h2>
+      </div>
+      <details id="det-metodo"><summary>Reglas de entrada, salida y valuación</summary><div class="details-body"><ul id="supuestos"></ul></div></details>
+      <details><summary>Parámetros de los indicadores</summary><div class="details-body"><ul id="parametros"></ul></div></details>
+      <details id="det-avisos" hidden><summary>Avisos de la última corrida</summary><div class="details-body"><ul id="avisos"></ul></div></details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong id="equipo-nombre"></strong>Integrantes: <span id="integrantes"></span></p>
+    <p id="pie-datos"></p>
+    <p>Trabajo académico, sin fines comerciales. No constituye asesoramiento de inversión. Precios: Yahoo Finance (yfinance) y Massive; recomendaciones: boletín "Trade Idea of the Week" de Danelfin AI.</p>
+    <p class="small">Librerías: Chart.js (MIT) y marked (MIT). Tipografías: Source Serif 4 y Atkinson Hyperlegible (SIL Open Font License; licencias en la carpeta <code>fonts/</code>).</p>
+  </div>
+</footer>
+
+<dialog id="detalle" aria-labelledby="det-titulo">
+  <div class="dlg-head">
+    <div><h3 id="det-titulo"></h3><p class="muted small" id="det-sub" style="margin:.2rem 0 0"></p></div>
+    <button class="btn icon-btn" type="button" id="det-cerrar" aria-label="Cerrar detalle">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="dlg-body" id="det-cuerpo"></div>
+</dialog>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="vendor/marked.min.js"></script>
+<script src="data/datos.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

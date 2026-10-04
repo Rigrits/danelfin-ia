@@ -1,0 +1,12 @@
+# Secretos y datos locales
+.env
+cache/
+__pycache__/
+*.pyc
+
+# Los mails originales de Danelfin NO se suben (contenido de un tercero): se importan a recomendaciones.csv
+*.eml
+
+# Se generan en cada corrida y se publican desde el workflow (no se versionan)
+web/data/datos.js
+web/descargas/*.xlsx
