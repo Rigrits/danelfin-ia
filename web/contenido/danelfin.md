@@ -35,5 +35,3 @@ Danelfin comunica que las acciones con AI Score 10 superaron al S&P 500 en prome
 3. Descripciones de la plataforma en directorios y reseñas (por ejemplo, [CB Insights](https://www.cbinsights.com/company/danelfin)), usadas solo para confirmar el concepto del AI Score de 1 a 10.
 4. Reseñas externas, por ejemplo [Pineify, «Danelfin Review»](https://pineify.app/danelfin/danelfin-review); no verificado contra los documentos de Danelfin.
 5. Boletín *Trade Idea of the Week* de Danelfin AI (mails reenviados por la cátedra, agosto a septiembre de 2026).
-
-*Nota: danelfin.com bloqueó la lectura automática de sus páginas (HTTP 403), por lo que los datos de esta sección deben contrastarse con el sitio oficial antes de la presentación.*
