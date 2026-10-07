@@ -10,9 +10,11 @@
   var Fmt = {
     n2: function (v) { return v == null ? '—' : num(v, 2); },
     n1: function (v) { return v == null ? '—' : num(v, 1); },
+    round: function (v, d) { return Number((v * 100).toFixed(d == null ? 1 : d)); },
     pct: function (v, d) {
       if (v == null) return '—';
       d = d == null ? 1 : d;
+      if (Fmt.round(v, d) === 0) v = 0;     // "−0,0%" -> "0,0%"
       var s = num(v * 100, d);
       return (v > 0 && s.charAt(0) !== MINUS ? '+' : '') + s + '%';
     },
@@ -206,7 +208,7 @@
       tooltip: { callbacks: { label: function (it) { return it.dataset.label + ': ' + Fmt.pct(it.parsed.y, 1); } } } };
     o.scales = { x: { ticks: { color: t.ink2 }, grid: { display: false } }, y: pctAxis(t) };
     return new Chart(canvas, { type: 'bar', data: {
-      labels: list.map(function (a) { return a.ticker; }),
+      labels: list.map(function (a) { return a.etiqueta || a.ticker; }),
       datasets: [
         { label: 'Real', data: list.map(function (a) { return a.real; }), backgroundColor: t.real, borderRadius: 3, borderSkipped: false },
         { label: 'Hold', data: list.map(function (a) { return a.hold; }), backgroundColor: t.hold, borderRadius: 3, borderSkipped: false }
@@ -249,7 +251,7 @@
       tooltip: { callbacks: { label: function (it) { return 'Alpha: ' + Fmt.pct(it.parsed.y, 1); } } } };
     o.scales = { x: { ticks: { color: t.ink2 }, grid: { display: false }, border: { color: t.line2 } }, y: pctAxis(t) };
     var vals = list.map(function (a) { return a.alphaReal; });
-    return new Chart(canvas, { type: 'bar', data: { labels: list.map(function (a) { return a.ticker; }), datasets: [
+    return new Chart(canvas, { type: 'bar', data: { labels: list.map(function (a) { return a.etiqueta || a.ticker; }), datasets: [
       { label: 'Alpha real', data: vals, borderRadius: 3, borderSkipped: false,
         backgroundColor: vals.map(function (v) { return v >= 0 ? t.gain : t.loss; }) } ] },
       options: o, plugins: [valueLabels] });

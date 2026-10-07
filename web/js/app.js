@@ -24,8 +24,10 @@
   };
   function gl(v, d) {
     if (v == null) return '<span class="gl flat">—</span>';
-    var c = v > 0 ? 'up' : v < 0 ? 'down' : 'flat';
-    return '<span class="gl ' + c + '">' + I[c] + Fmt.pct(v, d == null ? 1 : d) + '</span>';
+    d = d == null ? 1 : d;
+    var r = Fmt.round(v, d);
+    var c = r > 0 ? 'up' : r < 0 ? 'down' : 'flat';
+    return '<span class="gl ' + c + '">' + I[c] + Fmt.pct(v, d) + '</span>';
   }
   function badge(a) {
     if (a.estado === 'stop') return '<span class="badge stop">' + I.x + 'Stop loss · ' + Fmt.dm(a.salida.fecha) + '</span>';
@@ -34,7 +36,14 @@
     return '<span class="badge open">Sin datos aún</span>';
   }
   function estadoTxt(a) { return a.estado === 'stop' ? 'Stop loss' : a.estado === 'take' ? 'Take profit' : a.estado === 'abierta' ? 'Abierta' : 'Sin datos'; }
-  function byTicker(t) { return D.acciones.filter(function (a) { return a.ticker === t; })[0]; }
+  function byId(id) { return D.acciones.filter(function (a) { return a.id === id; })[0]; }
+  // Si un ticker se recomendó más de una vez, la etiqueta visible suma la fecha.
+  (function () {
+    var n = {};
+    D.acciones.forEach(function (a) { n[a.ticker] = (n[a.ticker] || 0) + 1; });
+    D.acciones.forEach(function (a) { a.etiqueta = n[a.ticker] > 1 ? a.ticker + ' ' + Fmt.dm(a.fechaRec) : a.ticker; });
+  })();
+  function stale(a) { return a.fechaDato && a.fechaDato < D.meta.corte; }
 
   var st = { metrica: 'real', filtro: 'todas', orden: 'fecha' };
   function val(a) { return a[st.metrica]; }
@@ -87,13 +96,13 @@
         var again = host.querySelector('button[data-k="' + k + '"]'); if (again) again.focus();
         return;
       }
-      var t = e.target.closest('button[data-t]');
-      if (t) openDetail(t.getAttribute('data-t'));
+      var t = e.target.closest('button[data-id]');
+      if (t) openDetail(t.getAttribute('data-id'));
     });
     draw();
     return { draw: draw };
   }
-  function tkBtn(a) { return '<button type="button" class="linkbtn" data-t="' + esc(a.ticker) + '">' + esc(a.ticker) + '</button>'; }
+  function tkBtn(a) { return '<button type="button" class="linkbtn" data-id="' + esc(a.id) + '">' + esc(a.etiqueta) + '</button>'; }
 
   /* ------------------------------------------------------------ encabezado y resumen */
   function renderHeader() {
@@ -112,6 +121,14 @@
       k('Rendimiento hold promedio', gl(R.holdProm), 'sin vender: &uacute;ltimo cierre contra entrada') +
       k('Tocaron el stop loss', R.stops + '<span class="of">de ' + n + '</span>', R.takes + ' el take profit · ' + R.abiertas + ' abiertas') +
       k('Superaron al S&amp;P 500', R.superaronSPY + '<span class="of">de ' + n + '</span>', 'alpha promedio ' + Fmt.pct(R.alphaProm));
+    var des = D.meta.desactualizados || [];
+    if (des.length) {
+      var av = $('#aviso-datos');
+      av.textContent = 'Atención: ' + des.map(function (x) { return x.t + ' (dato al ' + Fmt.dm(x.fecha) + ')'; }).join(', ') +
+        (des.length === 1 ? ' no tiene' : ' no tienen') + ' todavía el cierre del ' + Fmt.date(D.meta.corte) +
+        ' porque la fuente de precios no lo publicó a tiempo. Se completa en la próxima actualización.';
+      av.hidden = false;
+    }
     $('#facts').innerHTML = R.frases.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('');
     var c = D.contenido && D.contenido.conclusiones;
     if (c && window.marked) { $('#conclusiones').innerHTML = marked.parse(c); $('#equipo-bloque').hidden = false; }
@@ -152,16 +169,18 @@
     $('#cuenta').textContent = l.length + ' de ' + D.acciones.length + ' recomendaciones';
     charts.grid.forEach(destroy); charts.grid = [];
     var g = $('#grid');
-    g.innerHTML = '';
+    g.innerHTML = l.length ? '' : '<p class="empty">Ninguna recomendación en este estado por ahora.</p>';
     l.forEach(function (a) {
       var b = document.createElement('button');
-      b.type = 'button'; b.className = 'card'; b.setAttribute('data-t', a.ticker);
-      b.setAttribute('aria-label', a.ticker + ', ' + estadoTxt(a) + ', ' + (val(a) == null ? 'sin datos' : Fmt.pct(val(a), 1)) + '. Ver detalle');
-      b.innerHTML = '<div class="card-top"><span class="tk">' + esc(a.ticker) + '</span><span class="co">' + esc(a.empresa) + '</span></div>' +
+      b.type = 'button'; b.className = 'card'; b.setAttribute('data-id', a.id);
+      b.setAttribute('aria-label', a.etiqueta + ', recomendada el ' + Fmt.date(a.fechaRec) + ', ' + estadoTxt(a) + ', ' +
+        (val(a) == null ? 'sin datos' : Fmt.pct(val(a), 1)) + (stale(a) ? ', dato al ' + Fmt.date(a.fechaDato) : '') + '. Ver detalle');
+      b.innerHTML = '<span class="card-top"><span class="tk">' + esc(a.etiqueta) + '</span><span class="co">' + esc(a.empresa) + '</span></span>' +
         badge(a) +
-        '<div class="big">' + gl(val(a)) + '</div>' +
-        '<div class="mini"><canvas aria-hidden="true"></canvas></div>' +
-        '<div class="lv"><span><small>Entrada</small>' + Fmt.n2(a.entrada) + '</span><span><small>Stop loss</small>' + Fmt.n2(a.sl) + '</span><span><small>Take profit</small>' + Fmt.n2(a.tp) + '</span></div>';
+        '<span class="big">' + gl(val(a)) + '</span>' +
+        (stale(a) ? '<span class="stale">Último dato: ' + Fmt.dm(a.fechaDato) + '</span>' : '') +
+        '<span class="mini"><canvas aria-hidden="true"></canvas></span>' +
+        '<span class="lv"><span><small>Entrada</small>' + Fmt.n2(a.entrada) + '</span><span><small>Stop loss</small>' + Fmt.n2(a.sl) + '</span><span><small>Take profit</small>' + Fmt.n2(a.tp) + '</span></span>';
       g.appendChild(b);
       var cv = $('canvas', b);
       var ch = Charts.mini(cv, a);
@@ -223,10 +242,10 @@
     });
 
     var sel = $('#ind-ticker');
-    sel.innerHTML = D.acciones.filter(function (a) { return a.indicadores.length; }).map(function (a) { return '<option value="' + esc(a.ticker) + '">' + esc(a.ticker) + ' · ' + esc(a.empresa) + '</option>'; }).join('');
+    sel.innerHTML = D.acciones.filter(function (a) { return a.indicadores.length; }).map(function (a) { return '<option value="' + esc(a.id) + '">' + esc(a.etiqueta) + ' · ' + esc(a.empresa) + '</option>'; }).join('');
     var evol = makeTable($('#ind-evol-wrap'), {
       caption: 'Evolución de los indicadores', sortKey: null,
-      rows: function () { var a = byTicker(sel.value); return a ? a.indicadores : []; },
+      rows: function () { var a = byId(sel.value); return a ? a.indicadores : []; },
       cols: [
         { key: 'm', label: 'Momento', left: true, cell: function (s) { return esc(s.momento); } },
         { key: 'f', label: 'Fecha', cell: function (s) { return Fmt.date(s.fecha); } },
@@ -288,8 +307,8 @@
   /* ------------------------------------------------------------ detalle */
   var dlg = $('#detalle');
   function openDetail(t) {
-    var a = byTicker(t); if (!a) return;
-    $('#det-titulo').textContent = a.ticker + ' · ' + a.empresa;
+    var a = byId(t); if (!a) return;
+    $('#det-titulo').textContent = a.etiqueta + ' · ' + a.empresa;
     $('#det-sub').textContent = 'Recomendada el ' + Fmt.date(a.fechaRec) + ' · AI Score ' + a.score + '/10 · probabilidad de superar al mercado ' + Fmt.pct(a.prob, 1).replace('+', '');
     var stat = function (k, v) { return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; };
     var h = '<div class="dlg-stats">' +
@@ -310,7 +329,7 @@
     destroy(charts.dlg);
     var cv = $('#ch-detalle');
     charts.dlg = (cv && a.serie.length) ? Charts.detalle(cv, a) : null;
-    dlg.setAttribute('data-t', a.ticker);
+    dlg.setAttribute('data-id', a.id);
   }
   function callout(a) {
     var s = '';
@@ -350,7 +369,7 @@
     });
   });
   $('#orden').addEventListener('change', function (e) { st.orden = e.target.value; renderGrid(); renderPanels(); });
-  $('#grid').addEventListener('click', function (e) { var c = e.target.closest('.card'); if (c) openDetail(c.getAttribute('data-t')); });
+  $('#grid').addEventListener('click', function (e) { var c = e.target.closest('.card'); if (c) openDetail(c.getAttribute('data-id')); });
 
   $('#tema').addEventListener('click', function () {
     var cur = document.documentElement.getAttribute('data-theme');
@@ -358,7 +377,7 @@
     document.documentElement.setAttribute('data-theme', nx);
     try { localStorage.setItem('tema', nx); } catch (e) {}
     renderGrid(); renderPanels();
-    if (dlg.open) { var a = byTicker(dlg.getAttribute('data-t')); if (a) drawDetail(a); }
+    if (dlg.open) { var a = byId(dlg.getAttribute('data-id')); if (a) drawDetail(a); }
   });
 
   // Resalta la sección visible en la navegación.

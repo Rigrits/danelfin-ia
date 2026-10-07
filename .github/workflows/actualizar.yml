@@ -2,10 +2,13 @@ name: Actualizar seguimiento y publicar web
 
 # Corre cada día hábil después del cierre de EE. UU. (16:00 hora de Nueva York):
 # 21:30 UTC = 17:30 en horario de verano / 16:30 en invierno. El minuto 30 evita el pico
-# de carga que GitHub tiene al comienzo de cada hora.
+# de carga que GitHub tiene al comienzo de cada hora (aun así, el cron suele demorarse horas).
+# La segunda corrida, a las 12:00 UTC del día siguiente (antes de la apertura), completa los
+# cierres que alguna fuente no había publicado todavía en la corrida de la noche.
 on:
   schedule:
     - cron: "30 21 * * 1-5"
+    - cron: "0 12 * * 2-6"
   workflow_dispatch:            # botón "Run workflow" en la pestaña Actions
   push:
     branches: [main]
@@ -56,8 +59,11 @@ jobs:
 
       # data/cierres.csv guarda los cierres de la última rueda. El commit diario mantiene
       # actividad en el repo (GitHub apaga los cron de repos públicos tras 60 días sin actividad).
-      # En feriados no hay datos nuevos y no se commitea nada.
+      # En feriados no hay datos nuevos y no se commitea nada. El mensaje lleva la fecha del
+      # último cierre registrado (no la de la corrida, que puede caer al día siguiente por la demora
+      # del cron). Si este paso falla (p. ej. un conflicto al subir), igual se publica la web.
       - name: Commitear los cierres del día
+        continue-on-error: true
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -65,7 +71,8 @@ jobs:
           if git diff --staged --quiet; then
             echo "Sin datos nuevos: no hay nada que commitear."
           else
-            git commit -m "chore: cierres $(date -u +%Y-%m-%d)"
+            ULTIMA=$(tail -n 1 data/cierres.csv | cut -d, -f1)
+            git commit -m "chore: cierres al ${ULTIMA}"
             git pull --rebase --autostash origin main || true
             git push
           fi

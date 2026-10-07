@@ -43,6 +43,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from pandas.tseries.holiday import (AbstractHolidayCalendar, GoodFriday, Holiday, USLaborDay,
+                                    USMartinLutherKingJr, USMemorialDay, USPresidentsDay,
+                                    USThanksgivingDay, nearest_workday, sunday_to_monday)
 import requests
 import xlsxwriter
 from xlsxwriter.utility import xl_col_to_name
@@ -101,11 +104,33 @@ def today_et() -> pd.Timestamp:
     return pd.Timestamp.now(tz=TZ_MARKET).tz_localize(None).normalize()
 
 
+class NYSEHolidays(AbstractHolidayCalendar):
+    """Feriados con mercado cerrado en NYSE (sin cierres anticipados de medio día)."""
+    rules = [
+        Holiday("Año Nuevo", month=1, day=1, observance=sunday_to_monday),
+        USMartinLutherKingJr, USPresidentsDay, GoodFriday, USMemorialDay,
+        Holiday("Juneteenth", month=6, day=19, start_date="2022-01-01", observance=nearest_workday),
+        Holiday("Día de la Independencia", month=7, day=4, observance=nearest_workday),
+        USLaborDay, USThanksgivingDay,
+        Holiday("Navidad", month=12, day=25, observance=nearest_workday),
+    ]
+
+
+_FERIADOS: set = set()
+
+
+def es_rueda(d: pd.Timestamp) -> bool:
+    if not _FERIADOS:
+        _FERIADOS.update(NYSEHolidays().holidays(start="2015-01-01", end="2035-12-31"))
+    return d.weekday() < 5 and d.normalize() not in _FERIADOS
+
+
 def expected_last_session(end: pd.Timestamp) -> pd.Timestamp:
+    """Última rueda que ya debería tener cierre publicado (saltea fines de semana y feriados de NYSE)."""
     d = end
     if d == today_et() and not market_closed_today():
         d -= pd.Timedelta(days=1)
-    while d.weekday() >= 5:
+    while not es_rueda(d):
         d -= pd.Timedelta(days=1)
     return d
 
@@ -286,26 +311,39 @@ def get_ohlcv(t: str, start: pd.Timestamp, end: pd.Timestamp, refresh: bool, key
             return cached[0].loc[:end], f"caché ({src})"
 
     df, src = None, ""
-    try:
-        y = fetch_yf(t, start, end)
-        if y is not None and y.index.max() >= target - pd.Timedelta(days=3):
+    for intento in range(2):        # yfinance a veces omite la última barra de algún ticker: un reintento
+        try:
+            y = fetch_yf(t, start, end)
+        except Exception as e:
+            y = None
+            if intento:
+                warnings.append(f"{t}: falló yfinance ({type(e).__name__}: {e})")
+        if y is not None and (df is None or y.index.max() > df.index.max()):
             df, src = y, "yfinance"
-        elif y is not None:
-            warnings.append(f"{t}: yfinance devolvió datos hasta {y.index.max():%d/%m/%Y} (se esperaba {target:%d/%m/%Y})")
-            df, src = y, "yfinance"
-    except Exception as e:
-        warnings.append(f"{t}: falló yfinance ({type(e).__name__}: {e})")
+        if df is not None and df.index.max() >= target:
+            break
+        if intento == 0:
+            time.sleep(5)
 
     if df is None or df.index.max() < target:
+        hasta = "sin datos" if df is None else f"datos hasta el {df.index.max():%d/%m/%Y}"
         if key:
             try:
                 m = fetch_massive(t, start, end, key)
                 if m is not None and (df is None or m.index.max() > df.index.max()):
                     df, src = m, "Massive (respaldo)"
+                    if df.index.max() < target:
+                        warnings.append(f"{t}: Massive tiene datos hasta el {df.index.max():%d/%m/%Y} "
+                                        f"(se esperaba el {target:%d/%m/%Y})")
+                else:
+                    ult = "sin datos" if m is None else f"datos hasta el {m.index.max():%d/%m/%Y}"
+                    warnings.append(f"{t}: yfinance con {hasta} y el respaldo Massive tampoco tiene el "
+                                    f"{target:%d/%m/%Y} ({ult})")
             except Exception as e:
-                warnings.append(f"{t}: falló Massive ({type(e).__name__}: {e})")
-        elif df is None:
-            warnings.append(f"{t}: sin respaldo Massive (falta MASSIVE_API_KEY en .env)")
+                warnings.append(f"{t}: yfinance con {hasta} y falló Massive ({type(e).__name__}: {e})")
+        else:
+            warnings.append(f"{t}: yfinance con {hasta} (se esperaba el {target:%d/%m/%Y}) y sin respaldo: "
+                            "falta MASSIVE_API_KEY")
 
     if df is None:
         if cached is not None:
@@ -881,7 +919,7 @@ def resumen_web(rows) -> dict:
 def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_dir: Path, xlsx_path: Path) -> Path:
     acciones = []
     for r in rows:
-        a = dict(ticker=r["t"], empresa=r["name"], fechaRec=_d(r["rec_date"]), score=r["score"], prob=r["prob"],
+        a = dict(id=f"{r['t']}-{_d(r['rec_date'])}", ticker=r["t"], empresa=r["name"], fechaRec=_d(r["rec_date"]), score=r["score"], prob=r["prob"],
                  winrate=r["winrate"], avgret=r["avgret"], entrada=r["entry"], sl=r["sl"], tp=r["tp"],
                  fuente=r["source"], notas=r["notes"], estadoTexto=r["status"],
                  real=_n(r["real"]), hold=_n(r["hold"]), recupero=r["recovered"], salida=None,
@@ -895,6 +933,7 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
         a["estado"] = "stop" if (ex and ex["kind"] == "SL") else "take" if ex else "abierta"
         a["fechaEntrada"] = _d(r["entry_day"])
         a["ultimo"] = _n(r["last_px"], 2)
+        a["fechaDato"] = _d(min(data[r["t"]]["df"].index.max(), val_date))
         if ex:
             a["salida"] = dict(fecha=_d(ex["date"]), precio=_n(ex["price"], 2), motivo=ex["kind"], ambiguo=ex["ambiguous"])
         bd, bp = r["spy_base"]
@@ -929,6 +968,9 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
         benchmark=BENCHMARK, equipo=sorted(INTEGRANTES, key=str.casefold), equipoNombre=EQUIPO_NOMBRE,
         params=dict(adx=ADX_LEN, rsi=RSI_LEN, mfi=MFI_LEN, macd=[MACD_FAST, MACD_SLOW, MACD_SIGNAL], emas=list(EMA_LENS)),
         supuestos=params_info, avisos=warnings,
+        desactualizados=[dict(t=t, fecha=_d(data[t]["df"].index.max()))
+                         for t in sorted({r["t"] for r in rows} | {BENCHMARK})
+                         if data[t]["df"].index.max() < val_date],
         excel=dict(ruta=f"descargas/{xlsx_path.name}", kb=round(xlsx_path.stat().st_size / 1024)),
     )
     payload = dict(
@@ -944,21 +986,25 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
 
 
 def update_cierres(data, tickers, last_session: pd.Timestamp, path: Path) -> bool:
-    """Agrega los cierres de la última rueda a data/cierres.csv (idempotente por fecha+ticker).
-    Es el 'dato diario' que el workflow commitea para que el repo mantenga actividad."""
+    """Mantiene data/cierres.csv: cierres diarios por ticker, idempotente por fecha+ticker.
+    Rellena huecos de días anteriores (por ejemplo, si una fuente no publicó a tiempo el cierre de
+    algún ticker). Es el 'dato diario' que el workflow commitea para que el repo mantenga actividad."""
+    cols = ["date", "ticker", "open", "high", "low", "close", "volume"]
+    old = (pd.read_csv(path, dtype={"date": str, "ticker": str, "volume": "Int64"}) if path.exists()
+           else pd.DataFrame(columns=cols))
+    desde = pd.Timestamp(old["date"].min()) if len(old) else last_session
     nuevas = []
     for t in tickers:
-        df = data[t]["df"]
-        if last_session in df.index:
-            q = df.loc[last_session]
-            nuevas.append(dict(date=_d(last_session), ticker=t, open=_n(q["open"], 2), high=_n(q["high"], 2),
-                               low=_n(q["low"], 2), close=_n(q["close"], 2), volume=int(q["volume"])))
+        for d, q in data[t]["df"].loc[desde:last_session].iterrows():
+            nuevas.append(dict(date=_d(d), ticker=t, open=_n(q["open"], 2), high=_n(q["high"], 2),
+                               low=_n(q["low"], 2), close=_n(q["close"], 2),
+                               volume=int(q["volume"]) if pd.notna(q["volume"]) else None))
     if not nuevas:
         return False
-    cols = ["date", "ticker", "open", "high", "low", "close", "volume"]
     new = pd.DataFrame(nuevas, columns=cols)
+    new["volume"] = new["volume"].astype("Int64")
+    old["volume"] = old["volume"].astype("Int64")
     path.parent.mkdir(parents=True, exist_ok=True)
-    old = pd.read_csv(path, dtype={"date": str}) if path.exists() else pd.DataFrame(columns=cols)
     merged = pd.concat([old, new]).drop_duplicates(subset=["date", "ticker"], keep="last") \
         .sort_values(["date", "ticker"]).reset_index(drop=True)
     txt = merged.to_csv(index=False, lineterminator="\n").encode("utf8")
