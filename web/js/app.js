@@ -29,6 +29,14 @@
     var c = r > 0 ? 'up' : r < 0 ? 'down' : 'flat';
     return '<span class="gl ' + c + '">' + I[c] + Fmt.pct(v, d) + '</span>';
   }
+  // Igual que gl, en dólares (ganancia/pérdida en valores absolutos).
+  function glUsd(v, d) {
+    if (v == null) return '<span class="gl flat">—</span>';
+    d = d == null ? 0 : d;
+    var r = Number(v.toFixed(d));
+    var c = r > 0 ? 'up' : r < 0 ? 'down' : 'flat';
+    return '<span class="gl ' + c + '">' + I[c] + Fmt.usd(v, d) + '</span>';
+  }
   function badge(a) {
     if (a.estado === 'stop') return '<span class="badge stop">' + I.x + 'Stop loss · ' + Fmt.dm(a.salida.fecha) + '</span>';
     if (a.estado === 'take') return '<span class="badge take">' + I.check + 'Take profit · ' + Fmt.dm(a.salida.fecha) + '</span>';
@@ -129,6 +137,16 @@
         ' porque la fuente de precios no lo publicó a tiempo. Se completa en la próxima actualización.';
       av.hidden = false;
     }
+    if (R.capital) {
+      var cell = function (label, html, sub) { return '<div class="cartera-cell"><span class="label">' + label + '</span><span class="v">' + html + '</span>' + (sub ? '<span class="sub">' + sub + '</span>' : '') + '</div>'; };
+      $('#cartera').innerHTML =
+        '<p class="cartera-head">Con <strong>' + Fmt.usd(R.capital, 0, false) + '</strong> en cada recomendación (' +
+        Fmt.usd(R.invertido, 0, false) + ' en total), a la fecha:</p><div class="cartera-row">' +
+        cell('Resultado real', glUsd(R.pnlReal), 'con los stop loss y take profit') +
+        cell('Hold (sin stops)', glUsd(R.pnlHold), 'último cierre contra entrada') +
+        cell('Mismo capital en el S&amp;P 500', glUsd(R.pnlSpy), 'en las mismas ventanas') + '</div>';
+      $('#cartera').hidden = false;
+    }
     $('#facts').innerHTML = R.frases.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('');
     var c = D.contenido && D.contenido.conclusiones;
     if (c && window.marked) { $('#conclusiones').innerHTML = marked.parse(c); $('#equipo-bloque').hidden = false; }
@@ -178,6 +196,7 @@
       b.innerHTML = '<span class="card-top"><span class="tk">' + esc(a.etiqueta) + '</span><span class="co">' + esc(a.empresa) + '</span></span>' +
         badge(a) +
         '<span class="big">' + gl(val(a)) + '</span>' +
+        '<span class="usd">' + glUsd(st.metrica === 'real' ? a.pnlReal : a.pnlHold) + ' <small>sobre ' + Fmt.usd(D.meta.capital, 0, false) + '</small></span>' +
         (stale(a) ? '<span class="stale">Último dato: ' + Fmt.dm(a.fechaDato) + '</span>' : '') +
         '<span class="mini"><canvas aria-hidden="true"></canvas></span>' +
         '<span class="lv"><span><small>Entrada</small>' + Fmt.n2(a.entrada) + '</span><span><small>Stop loss</small>' + Fmt.n2(a.sl) + '</span><span><small>Take profit</small>' + Fmt.n2(a.tp) + '</span></span>';
@@ -212,7 +231,9 @@
         { key: 'salida', label: 'Precio de salida', val: function (a) { return a.salida ? a.salida.precio : null; }, cell: function (a) { return a.salida ? Fmt.n2(a.salida.precio) : '—'; } },
         { key: 'ultimo', label: 'Último cierre', val: function (a) { return a.ultimo; }, cell: function (a) { return Fmt.n2(a.ultimo); } },
         { key: 'real', label: 'Real', val: function (a) { return a.real; }, cell: function (a) { return gl(a.real); } },
-        { key: 'hold', label: 'Hold', val: function (a) { return a.hold; }, cell: function (a) { return gl(a.hold); } }
+        { key: 'hold', label: 'Hold', val: function (a) { return a.hold; }, cell: function (a) { return gl(a.hold); } },
+        { key: 'pnlReal', label: 'G/P real (US$)', val: function (a) { return a.pnlReal; }, cell: function (a) { return glUsd(a.pnlReal, 2); } },
+        { key: 'pnlHold', label: 'G/P hold (US$)', val: function (a) { return a.pnlHold; }, cell: function (a) { return glUsd(a.pnlHold, 2); } }
       ]
     });
   }
@@ -314,7 +335,9 @@
     var h = '<div class="dlg-stats">' +
       stat('Entrada', Fmt.n2(a.entrada)) + stat('Stop loss', Fmt.n2(a.sl)) + stat('Take profit', Fmt.n2(a.tp)) +
       stat('Último cierre', Fmt.n2(a.ultimo)) + stat('Real', gl(a.real)) + stat('Hold', gl(a.hold)) +
-      stat('S&amp;P 500 en la ventana', gl(a.spyReal)) + stat('Alpha real', gl(a.alphaReal)) + '</div>';
+      stat('S&amp;P 500 en la ventana', gl(a.spyReal)) + stat('Alpha real', gl(a.alphaReal)) +
+      stat('G/P real sobre ' + Fmt.usd(D.meta.capital, 0, false), glUsd(a.pnlReal, 2)) +
+      stat('G/P hold sobre ' + Fmt.usd(D.meta.capital, 0, false), glUsd(a.pnlHold, 2)) + '</div>';
     h += callout(a);
     h += '<div class="dlg-chart"><canvas id="ch-detalle" role="img" aria-label="Precio diario de ' + esc(a.ticker) + ' con entrada, stop loss, take profit y salida"></canvas></div>';
     h += '<p class="muted small">Línea azul: cierre diario hasta la salida (gris punteada: lo que habría pasado después). Banda azul clara: rango diario mínimo–máximo. ✕: salida simulada.</p>';

@@ -60,6 +60,7 @@ CACHE_DIR = BASE / "cache"
 
 INTEGRANTES = ["Vivas", "Devita", "Rodriguez", "Toffoletti", "Sanguinetti", "Guevara"]   # se muestran en orden alfabético
 EQUIPO_NOMBRE = ""                 # nombre del equipo (el TP pide ponerle uno); vacío = no se muestra
+CAPITAL_POR_IDEA = 1000.0          # USD invertidos en cada recomendación: base de la ganancia/pérdida en valores absolutos
 
 BENCHMARK = "SPY"                 # S&P 500 (ETF)
 HISTORY_DAYS = 420                # historia previa a la 1ª recomendación (EMA 200, ADX)
@@ -575,13 +576,21 @@ def write_excel(rows, fridays, val_date, params_info, warnings, out_path: Path):
     fcol0 = len(heads)
     heads += [f"Precio Vie {f:%d/%m/%y}" for f in fridays] + [f"Último cierre {val_date:%d/%m/%y}",
                                                              "Rendimiento Real (con SL/TP)",
-                                                             "Rendimiento Hold (sin SL/TP)"]
+                                                             "Rendimiento Hold (sin SL/TP)",
+                                                             "Ganancia/Pérdida Real (USD)",
+                                                             "Ganancia/Pérdida Hold (USD)"]
     cR, cH = fcol0 + nF + 1, fcol0 + nF + 2
+    cGR, cGH = cH + 1, cH + 2
+    cap_row = n + 2                      # fila (Excel) de totales; el capital por idea queda en la columna de Hold
     L = lambda name: xl_col_to_name(C[name])
     cEnt, cEx, cExP = L("Precio de Entrada"), L("Fecha de Salida"), L("Precio de Salida (SL/TP)")
     cRec, cSt = L("Fecha de Recomendación"), L("Estado")
     cLast = xl_col_to_name(fcol0 + nF)           # columna 'Último cierre'
     cRL, cHL = xl_col_to_name(cR), xl_col_to_name(cH)
+    cGRL, cGHL = xl_col_to_name(cGR), xl_col_to_name(cGH)
+    f_usd = F(border=1, num_format='"US$" #,##0.00;-"US$" #,##0.00')
+    f_usd_b = F(border=1, bold=True, num_format='"US$" #,##0.00;-"US$" #,##0.00')
+    f_cap = F(border=2, bold=True, bg_color="#FFF2CC", num_format='"US$" #,##0')
     ws_seg.set_row(0, 48)
     for i, h in enumerate(heads):
         ws_seg.write(0, i, h, f_head if i < 8 else f_head_op if i < fcol0 else f_head_fr if i < cR else f_head_rs)
@@ -621,9 +630,22 @@ def write_excel(rows, fridays, val_date, params_info, warnings, out_path: Path):
         if r["real"] is not None:
             ws_seg.write_formula(i, cR, f'=IF(ISNUMBER({cExP}{x}),{cExP}{x},{cLast}{x})/{cEnt}{x}-1', f_pct, r["real"])
             ws_seg.write_formula(i, cH, f'={cLast}{x}/{cEnt}{x}-1', f_pct, r["hold"])
+            ws_seg.write_formula(i, cGR, f'={cRL}{x}*${cHL}${cap_row}', f_usd, CAPITAL_POR_IDEA * r["real"])
+            ws_seg.write_formula(i, cGH, f'={cHL}{x}*${cHL}${cap_row}', f_usd, CAPITAL_POR_IDEA * r["hold"])
         else:
-            ws_seg.write_blank(i, cR, None, f_pct)
-            ws_seg.write_blank(i, cH, None, f_pct)
+            for c_ in (cR, cH, cGR, cGH):
+                ws_seg.write_blank(i, c_, None, f_pct)
+    # fila de totales: capital por idea (editable) y suma de ganancias/pérdidas
+    done_ = [r for r in rows if r["real"] is not None]
+    ws_seg.write(n + 1, 0, "Total", F(bold=True))
+    ws_seg.write(n + 1, cR, "Capital por idea →", F(bold=True, align="right"))
+    ws_seg.write(n + 1, cH, CAPITAL_POR_IDEA, f_cap)
+    ws_seg.write_comment(n + 1, cH, "Monto en USD invertido en cada recomendación. Cambialo y se recalculan las ganancias/pérdidas.")
+    ws_seg.write_formula(n + 1, cGR, f"=SUM({cGRL}{r0}:{cGRL}{r1})", f_usd_b,
+                         CAPITAL_POR_IDEA * sum(r["real"] for r in done_))
+    ws_seg.write_formula(n + 1, cGH, f"=SUM({cGHL}{r0}:{cGHL}{r1})", f_usd_b,
+                         CAPITAL_POR_IDEA * sum(r["hold"] for r in done_))
+    pct_cf(ws_seg, f"{cGRL}{r0}:{cGHL}{cap_row}")
     pct_cf(ws_seg, f"{cRL}{r0}:{cHL}{r1}")
     stc = f"{cSt}{r0}:{cSt}{r1}"
     for txt, fmt in (("Stop", f_red), ("Take", f_green), ("Abierta", f_amber)):
@@ -636,8 +658,9 @@ def write_excel(rows, fridays, val_date, params_info, warnings, out_path: Path):
     ws_seg.set_column(14, 14, 28)
     ws_seg.set_column(15, 15, 34)
     ws_seg.set_column(fcol0, cH, 12)
+    ws_seg.set_column(cGR, cGH, 15)
     ws_seg.freeze_panes(1, 2)
-    ws_seg.autofilter(0, 0, n, cH)
+    ws_seg.autofilter(0, 0, n, cGH)
 
     S = f"'{SEG}'!"
     rng = lambda col: f"{S}${col}${r0}:${col}${r1}"
@@ -812,7 +835,7 @@ def write_excel(rows, fridays, val_date, params_info, warnings, out_path: Path):
                        "RSI>50, MFI>50, MACD>señal.", f_note)
 
     # ---------- Notas, supuestos y gráfico (debajo de la tabla de Seguimiento)
-    nrow = n + 2
+    nrow = n + 3
     ws_seg.write(nrow, 0, f"Corte: último cierre {val_date:%d/%m/%Y} · generado {dt.datetime.now():%d/%m/%Y %H:%M}", f_sub)
     ws_seg.write(nrow + 1, 0, "Parámetros, supuestos y avisos", f_sub)
     notes = list(params_info) + [f"AVISO: {w}" for w in warnings]
@@ -865,6 +888,11 @@ def _pct(x: float, signo: bool = True) -> str:
     return s.replace(".", ",").replace("-", "−")
 
 
+def _usd(x: float, signo: bool = True) -> str:
+    s = f"{abs(x):,.0f}".replace(",", ".")
+    return ("\u2212" if x < -0.5 else "+" if (x > 0.5 and signo) else "") + "US$ " + s
+
+
 def _leer_md(path: Path) -> str | None:
     if not path.exists():
         return None
@@ -897,6 +925,10 @@ def resumen_web(rows) -> dict:
         stopsAyudaron=helped, stopsPerjudicaron=hurt,
         superaronSPY=sum(1 for a in alphas if a > 0), alphaProm=mean(alphas),
         winrateDanelfin=wr, avgretDanelfin=ar, probProm=mean([r["prob"] for r in rows]),
+        capital=CAPITAL_POR_IDEA, invertido=CAPITAL_POR_IDEA * n,
+        pnlReal=round(CAPITAL_POR_IDEA * sum(r["real"] for r in done), 2),
+        pnlHold=round(CAPITAL_POR_IDEA * sum(r["hold"] for r in done), 2),
+        pnlSpy=round(CAPITAL_POR_IDEA * sum(r["spy_end"][1] / r["spy_base"][1] - 1 for r in done), 2),
     )
     f = []
     if n:
@@ -909,6 +941,9 @@ def resumen_web(rows) -> dict:
         f.append(f"Sin stops (hold) el promedio habría sido {_pct(res['holdProm'])}. "
                  f"El stop ayudó en {_pl(helped, 'caso', 'casos')} y perjudicó en {_pl(hurt, 'caso', 'casos')}.")
         f.append(f"{res['superaronSPY']} de {n} superaron al S&P 500 (SPY); alpha promedio: {_pct(res['alphaProm'])}.")
+        f.append(f"Con {_usd(CAPITAL_POR_IDEA, signo=False)} en cada recomendación ({_usd(res['invertido'], signo=False)} en total), "
+                 f"el resultado real a la fecha es {_usd(res['pnlReal'])}; sin stops sería {_usd(res['pnlHold'])}, y el mismo "
+                 f"capital en el S&P 500 en las mismas ventanas habría dado {_usd(res['pnlSpy'])}.")
         if wr is not None and ar is not None:
             f.append(f"Los mails citan un win rate histórico a 3 meses de {_pct(wr, False)} y un retorno promedio de "
                      f"{_pct(ar)}; en este seguimiento el retorno real promedio es {_pct(res['realProm'])}.")
@@ -940,7 +975,9 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
         spy_r = r["spy_end"][1] / bp - 1
         spy_h = r["spy_val"][1] / bp - 1
         a.update(spyReal=_n(spy_r), spyHold=_n(spy_h), alphaReal=_n(r["real"] - spy_r), alphaHold=_n(r["hold"] - spy_h),
-                 spyBase=dict(fecha=_d(bd), precio=_n(bp, 2)))
+                 spyBase=dict(fecha=_d(bd), precio=_n(bp, 2)),
+                 pnlReal=_n(CAPITAL_POR_IDEA * r["real"], 2), pnlHold=_n(CAPITAL_POR_IDEA * r["hold"], 2),
+                 pnlSpy=_n(CAPITAL_POR_IDEA * spy_r, 2))
         for j, f in enumerate(fridays):
             if f <= r["rec_date"]:
                 continue
@@ -965,7 +1002,7 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
 
     meta = dict(
         corte=_d(val_date), generado=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        benchmark=BENCHMARK, equipo=sorted(INTEGRANTES, key=str.casefold), equipoNombre=EQUIPO_NOMBRE,
+        benchmark=BENCHMARK, capital=CAPITAL_POR_IDEA, equipo=sorted(INTEGRANTES, key=str.casefold), equipoNombre=EQUIPO_NOMBRE,
         params=dict(adx=ADX_LEN, rsi=RSI_LEN, mfi=MFI_LEN, macd=[MACD_FAST, MACD_SLOW, MACD_SIGNAL], emas=list(EMA_LENS)),
         supuestos=params_info, avisos=warnings,
         desactualizados=[dict(t=t, fecha=_d(data[t]["df"].index.max()))
@@ -1096,6 +1133,9 @@ def main() -> None:
         f"Las posiciones abiertas se valúan al último cierre disponible ({val_date:%d/%m/%Y}).",
         f"Indicadores: ADX/+DI/-DI {ADX_LEN}, RSI {RSI_LEN}, MFI {MFI_LEN}, MACD {MACD_FAST}/{MACD_SLOW}/{MACD_SIGNAL}, "
         f"EMA {'/'.join(map(str, EMA_LENS))}; Wilder (RMA) sembrado con SMA. 'Al entrar' usa el cierre de la rueda previa.",
+        f"Ganancia/pérdida en valores absolutos: se supone que se invierten {_usd(CAPITAL_POR_IDEA, signo=False)} en cada recomendación "
+        "al precio de entrada (sin comisiones ni impuestos); real = capital × rendimiento real, hold = capital × rendimiento hold. "
+        "En el Excel, el capital se puede cambiar en la fila 'Total'.",
         "Benchmark: SPY desde el cierre previo a la entrada. Pocos casos en un solo trimestre: las conclusiones son ilustrativas, "
         "no inferencia estadística. Trabajo académico: no constituye asesoramiento de inversión.",
     ]

@@ -139,6 +139,17 @@ section:first-of-type { border-top: 0; }
 @media (max-width: 340px) { .kpis { grid-template-columns: 1fr; } }
 @media (max-width: 460px) { .kpi { padding: 1rem .9rem; } }
 
+.cartera { margin: -1rem 0 2.2rem; }
+.cartera-head { margin: 0 0 .7rem; color: var(--ink-2); font-size: .95rem; }
+.cartera-head strong { color: var(--ink); }
+.cartera-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.cartera-cell { background: var(--surface); padding: 1rem 1.2rem; display: grid; gap: .25rem; }
+.cartera-cell .label { font-size: .85rem; color: var(--ink-2); }
+.cartera-cell .v { font-family: var(--serif); font-weight: 700; font-size: clamp(1.4rem, 2.8vw, 2rem); line-height: 1.1; }
+.cartera-cell .sub { font-size: .78rem; color: var(--ink-3); }
+@media (max-width: 700px) { .cartera-row { grid-template-columns: 1fr; } }
+.card .usd { display: block; font-size: .9rem; margin-top: -.3rem; }
+.card .usd small { color: var(--ink-3); font-weight: 400; font-size: .75rem; }
 .readout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
 @media (max-width: 900px) { .readout { grid-template-columns: 1fr; } }
 .readout h3 { margin-bottom: .8rem; }

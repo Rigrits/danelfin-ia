@@ -10,6 +10,14 @@
   var Fmt = {
     n2: function (v) { return v == null ? '—' : num(v, 2); },
     n1: function (v) { return v == null ? '—' : num(v, 1); },
+    // Dólares: "−US$ 83" / "+US$ 1.204". d = decimales (0 por defecto).
+    usd: function (v, d, signo) {
+      if (v == null) return '—';
+      d = d == null ? 0 : d;
+      if (Number(v.toFixed(d)) === 0) v = 0;
+      var s = Math.abs(v).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+      return (v < 0 ? MINUS : (v > 0 && signo !== false ? '+' : '')) + 'US$ ' + s;
+    },
     round: function (v, d) { return Number((v * 100).toFixed(d == null ? 1 : d)); },
     pct: function (v, d) {
       if (v == null) return '—';
