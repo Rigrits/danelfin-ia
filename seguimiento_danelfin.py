@@ -922,6 +922,24 @@ def _leer_empresas(path: Path) -> dict | None:
     return out
 
 
+def versionar_assets(site_dir: Path) -> None:
+    """Agrega ?v=<hash del contenido> a los CSS y JS propios de index.html, para que el navegador
+    no mezcle archivos nuevos con viejos de su caché después de una actualización."""
+    import hashlib
+    idx = site_dir / "index.html"
+    html = idx.read_text(encoding="utf8")
+
+    def sello(m):
+        attr, ruta = m.group(1), m.group(2)
+        f = site_dir / ruta
+        if not f.exists():
+            return m.group(0)
+        return f'{attr}="{ruta}?v={hashlib.sha1(f.read_bytes()).hexdigest()[:8]}"'
+    nuevo = re.sub(r'(src|href)="((?:css|js|vendor)/[^"?]+\.(?:css|js))(?:\?v=[^"]*)?"', sello, html)
+    if nuevo != html:
+        idx.write_text(nuevo, encoding="utf8")
+
+
 def _leer_presentacion(path: Path) -> dict | None:
     """Lee web/contenido/presentacion.md: diapositivas "## N · Nombre" con campos "clave: valor" arriba
     (los campos repetidos, como punto o caso, se juntan en una lista) y notas en Markdown debajo.
@@ -1219,6 +1237,7 @@ def main() -> None:
     site = Path(args.site_dir)
     datos = export_web(rows, data, spy, fridays, val_date, params_info, warnings, site, out)
     log(f"    Web   -> {datos}")
+    versionar_assets(site)
     if not args.sin_cierres:
         cambio = update_cierres(data, tickers, last_data, CIERRES_CSV)
         log(f"    Cierres {last_data:%d/%m/%Y} -> {CIERRES_CSV.relative_to(BASE)} ({'actualizado' if cambio else 'sin cambios'})")
