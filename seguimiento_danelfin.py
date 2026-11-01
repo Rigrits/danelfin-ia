@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Seguimiento de recomendaciones Danelfin AI (TP IA - Sistema Financiero Internacional)
+Seguimiento independiente de las recomendaciones de Danelfin AI
 
 Qué hace
   1. Lee recomendaciones.csv (ticker, fecha, AI Score, entrada, SL, TP). Los mails .eml se convierten
@@ -59,7 +59,7 @@ CIERRES_CSV = BASE / "data" / "cierres.csv"
 CACHE_DIR = BASE / "cache"
 
 INTEGRANTES = ["Vivas", "Devita", "Rodriguez", "Toffoletti", "Sanguinetti", "Guevara"]   # se muestran en orden alfabético
-EQUIPO_NOMBRE = ""                 # nombre del equipo (el TP pide ponerle uno); vacío = no se muestra
+EQUIPO_NOMBRE = ""                 # nombre del equipo o firma; vacío = no se muestra
 CAPITAL_POR_IDEA = 1000.0          # USD invertidos en cada recomendación: base de la ganancia/pérdida en valores absolutos
 
 BENCHMARK = "SPY"                 # S&P 500 (ETF)
@@ -1167,8 +1167,8 @@ def main() -> None:
         f"Ganancia/pérdida en valores absolutos: se supone que se invierten {_usd(CAPITAL_POR_IDEA, signo=False)} en cada recomendación "
         "al precio de entrada (sin comisiones ni impuestos); real = capital × rendimiento real, hold = capital × rendimiento hold. "
         "En el Excel, el capital se puede cambiar en la fila 'Total'.",
-        "Benchmark: SPY desde el cierre previo a la entrada. Pocos casos en un solo trimestre: las conclusiones son ilustrativas, "
-        "no inferencia estadística. Trabajo académico: no constituye asesoramiento de inversión.",
+        "Benchmark: SPY desde el cierre previo a la entrada. La muestra es de un trimestre y un número acotado de recomendaciones: "
+        "los resultados describen este período y no permiten inferencias estadísticas. No constituye asesoramiento de inversión.",
     ]
 
     log("5/5 Escribiendo Excel y datos de la web ...")

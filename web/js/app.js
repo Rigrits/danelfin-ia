@@ -1,4 +1,4 @@
-/* TP IA · Danelfin — lógica de la página. Todo sale de window.DATOS (web/data/datos.js, generado por el script). */
+/* Seguimiento Danelfin — lógica de la página. Todo sale de window.DATOS (web/data/datos.js, generado por el script). */
 (function () {
   'use strict';
   var D = window.DATOS;

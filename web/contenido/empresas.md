@@ -1,7 +1,7 @@
 <!--
   Fichas de las empresas recomendadas. Se incorporan al sitio al correr el script.
   Formato: cada empresa empieza con "## TICKER · Nombre" y su primera línea "bajada:" es el resumen corto
-  (lo que se dice en clase). El resto es la ficha completa en Markdown.
+  (resumen corto que se muestra arriba de cada ficha). El resto es la ficha completa en Markdown.
   La sección "## Contexto general" (sin ticker) se muestra arriba de las fichas.
   Fuentes buscadas el 01/11/2026; cifras de noticias aproximadas y a verificar por el equipo.
   Rendimientos al 30/10/2026 (último cierre del seguimiento al escribir esto): se actualizan solos en la web, el texto no.
@@ -156,7 +156,7 @@ bajada: Una de las mayores mineras de oro del mundo. Recibió el puntaje máximo
 
 **Qué mirar.** El precio del oro, que depende de lo que haga la Fed en diciembre y de la inflación. Los costos de la minería, que suben con la energía cara, achican el margen justo cuando el metal baja. También los riesgos propios de operar en varios países africanos.
 
-**Para el análisis.** Real −11,3% frente a hold −23,6%. Es la mejor pregunta para la exposición: **la nota más alta de Danelfin fue una de las peores**. El modelo no anticipó un cambio macro (tasas) que pesa más que cualquier dato de la empresa.
+**Para el análisis.** Real −11,3% frente a hold −23,6%. Es el caso más llamativo del seguimiento: **la nota más alta de Danelfin fue una de las peores**. El modelo no anticipó un cambio macro (tasas) que pesa más que cualquier dato de la empresa.
 
 ## AAPL · Apple
 
@@ -170,7 +170,7 @@ bajada: La empresa más conocida de la lista, con nuevo CEO desde septiembre. Si
 
 **Qué mirar.** Los resultados del 2/11: ventas del iPhone 18, restricciones de suministro y la guía para el trimestre de fin de año. También cómo se consolida la transición de CEO y su estrategia de inteligencia artificial, donde se la percibe más cauta que a sus competidoras.
 
-**Para el análisis.** Abierta, +2,5%, superando levemente al S&P 500 en la misma ventana. Los resultados del 2/11 pueden moverla antes de la presentación: conviene actualizar el dato ese día.
+**Para el análisis.** Abierta, +2,5%, superando levemente al S&P 500 en la misma ventana. Los resultados del 2/11 pueden moverla en los próximos días.
 
 ## PH · Parker-Hannifin
 

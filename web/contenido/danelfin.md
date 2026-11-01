@@ -11,9 +11,9 @@ Danelfin es una plataforma de análisis de acciones basada en inteligencia artif
 ## Cómo lo hace
 
 - **Qué analiza:** según la propia empresa, el modelo procesa más de 10.000 características diarias por acción, de tipo fundamental, técnico y de sentimiento [1].
-- **Qué entrega:** además del AI Score, la probabilidad de superar al mercado en 3 meses. En los mails que usamos en este trabajo, por ejemplo, RTX figura con una probabilidad de 57,42% frente a 51,20% de una acción promedio de EE. UU. [mails de Danelfin].
+- **Qué entrega:** además del AI Score, la probabilidad de superar al mercado en 3 meses. En los boletines analizados en este informe, por ejemplo, RTX figura con una probabilidad de 57,42% frente a 51,20% de una acción promedio de EE. UU. [mails de Danelfin].
 - **Cobertura:** acciones y ETF de EE. UU. y las empresas del índice STOXX Europe 600 [1][2].
-- **Idea de la semana (*Trade Idea of the Week*):** cada semana el boletín destaca una acción con score de compra (BUY) cuyas señales de compra pasadas tuvieron una tasa de acierto de 70% o más a 3 meses desde 2017. Cada mail trae además parámetros sugeridos: precio de entrada, horizonte de 3 meses, **stop loss** y **take profit** (o salida si cambia el AI Score) [mails de Danelfin]. Son esos parámetros los que seguimos en este trabajo.
+- **Idea de la semana (*Trade Idea of the Week*):** cada semana el boletín destaca una acción con score de compra (BUY) cuyas señales de compra pasadas tuvieron una tasa de acierto de 70% o más a 3 meses desde 2017. Cada mail trae además parámetros sugeridos: precio de entrada, horizonte de 3 meses, **stop loss** y **take profit** (o salida si cambia el AI Score) [mails de Danelfin]. Son esos parámetros los que se siguen en este informe.
 
 ## Historia
 
@@ -24,7 +24,7 @@ Danelfin es una plataforma de análisis de acciones basada en inteligencia artif
 
 ## Qué dice de sí misma y cómo leerlo
 
-Danelfin comunica que las acciones con AI Score 10 superaron al S&P 500 en promedio en los 3 meses siguientes (+14,69% en cinco años, según la nota de prensa de 2024) [1]. Reseñas externas señalan que la cifra de rendimiento acumulado que difunde la empresa para su estrategia es un *backtest* (simulación sobre datos pasados), no un historial auditado en vivo, y que la empresa publica aparte una página con el seguimiento de señales hacia adelante [4]. Esa distinción importa para este trabajo: lo que hacemos acá es un seguimiento en tiempo real de unas pocas señales.
+Danelfin comunica que las acciones con AI Score 10 superaron al S&P 500 en promedio en los 3 meses siguientes (+14,69% en cinco años, según la nota de prensa de 2024) [1]. Reseñas externas señalan que la cifra de rendimiento acumulado que difunde la empresa para su estrategia es un *backtest* (simulación sobre datos pasados), no un historial auditado en vivo, y que la empresa publica aparte una página con el seguimiento de señales hacia adelante [4]. Esa distinción importa: este informe es un seguimiento en tiempo real de un conjunto acotado de señales, no una simulación sobre datos pasados.
 
 **Una diferencia que conviene tener presente.** El AI Score estima superar *al mercado* (un resultado relativo), mientras que el stop loss y el take profit de los mails son niveles de precio *absolutos*. Por eso medimos las dos cosas: el rendimiento con esas reglas y el *alpha* contra el S&P 500.
 
@@ -34,4 +34,4 @@ Danelfin comunica que las acciones con AI Score 10 superaron al S&P 500 en prome
 2. Merca2, [«Danelfin, la nueva plataforma de inteligencia artificial para el análisis de acciones»](https://www.merca2.es/2021/09/26/danelfin-stoxx-600-ai-score-1163803/), 26/09/2021.
 3. Descripciones de la plataforma en directorios y reseñas (por ejemplo, [CB Insights](https://www.cbinsights.com/company/danelfin)), usadas solo para confirmar el concepto del AI Score de 1 a 10.
 4. Reseñas externas, por ejemplo [Pineify, «Danelfin Review»](https://pineify.app/danelfin/danelfin-review); no verificado contra los documentos de Danelfin.
-5. Boletín *Trade Idea of the Week* de Danelfin AI (mails reenviados por la cátedra, agosto a septiembre de 2026).
+5. Boletín *Trade Idea of the Week* de Danelfin AI (boletines de julio a septiembre de 2026).
