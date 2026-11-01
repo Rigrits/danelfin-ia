@@ -497,5 +497,8 @@
   renderHeader(); renderHero(); renderDanelfin();
   renderGrid(); renderPanels(); renderTablaResultados();
   renderEmpresas(); renderTecnicas(); renderIndicadores(); renderMetodologia(); renderPie();
+  // Lo que usa el modo presentación (js/presentacion.js).
+  window.App = { D: D, openDetail: openDetail, gl: gl, glUsd: glUsd, badge: badge, byId: byId, esc: esc,
+    estadoTxt: estadoTxt, entradaSnap: entradaSnap, detalle: dlg };
   $('#det-cuerpo').addEventListener('click', function (e) { var b = e.target.closest('#det-ficha'); if (b) irAFicha(b.getAttribute('data-tk')); });
 })();

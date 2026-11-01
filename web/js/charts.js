@@ -267,8 +267,8 @@
 
   /* ---------------------------------------------------------------- técnico al recomendar */
   // Precio y medias de los ~6 meses previos a la recomendación (solo lo que se veía ese día).
-  function tecPrecio(canvas, a) {
-    var t = theme(), p = a.pre;
+  function tecPrecio(canvas, a, opts) {
+    var t = theme(), p = a.pre, compacto = opts && opts.compacto;
     if (!p || !p.length) return null;
     var labels = p.map(function (x) { return x.d; });
     var ds = function (label, key, color, width, dash) {
@@ -284,6 +284,10 @@
       x: { ticks: { color: t.ink3, maxTicksLimit: 6, callback: function (v) { return Fmt.dm(this.getLabelForValue(v)); } }, grid: { display: false } },
       y: { ticks: { color: t.ink3, callback: function (v) { return Fmt.n2(v); } }, grid: { color: t.line }, border: { display: false } }
     };
+    if (compacto) {                       // versión chica para la grilla del modo presentación
+      o.scales.x.display = false; o.scales.y.display = false;
+      o.events = []; o.plugins.tooltip = { enabled: false }; o.animation = false;
+    }
     return new Chart(canvas, { type: 'line', data: { labels: labels, datasets: [
       ds('Cierre', 'c', t.ink, 2.2),
       ds('EMA 20', 'e20', t.real, 1.6),
@@ -316,6 +320,21 @@
     return out;
   }
 
+  /* ---------------------------------------------------------------- qué hizo el stop (real - hold) */
+  function stopDiff(canvas, list) {
+    var t = theme();
+    var o = base(t);
+    o.layout = { padding: { top: 22, bottom: 16 } };
+    o.plugins = { legend: { display: false }, valueLabels: { color: t.ink },
+      tooltip: { callbacks: { label: function (it) { return 'Real menos hold: ' + Fmt.pct(it.parsed.y, 1); } } } };
+    o.scales = { x: { ticks: { color: t.ink2 }, grid: { display: false }, border: { color: t.line2 } }, y: pctAxis(t) };
+    var vals = list.map(function (a) { return a.real - a.hold; });
+    return new Chart(canvas, { type: 'bar', data: { labels: list.map(function (a) { return a.etiqueta || a.ticker; }), datasets: [
+      { label: 'Real menos hold', data: vals, borderRadius: 3, borderSkipped: false,
+        backgroundColor: vals.map(function (v) { return v >= 0 ? t.gain : t.loss; }) } ] },
+      options: o, plugins: [valueLabels] });
+  }
+
   window.Fmt = Fmt;
-  window.Charts = { mini: mini, detalle: detalle, barras: barras, semanal: semanal, alpha: alpha, tecPrecio: tecPrecio, tecOsc: tecOsc };
+  window.Charts = { mini: mini, detalle: detalle, barras: barras, semanal: semanal, alpha: alpha, tecPrecio: tecPrecio, tecOsc: tecOsc, stopDiff: stopDiff };
 })();

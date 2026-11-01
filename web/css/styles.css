@@ -302,3 +302,94 @@ details[open] summary { border-bottom: 1px solid var(--line); }
 .tec-osc { border: 0; background: transparent; margin: .6rem 0 0; }
 .tec-osc summary { padding: .3rem 0; min-height: 44px; display: flex; align-items: center; color: var(--real-text); }
 .tec-osc[open] summary { border-bottom: 0; }
+
+/* ------------------------------------------------------------ modo presentación */
+.pr { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; border-radius: 0;
+  background: var(--bg); color: var(--ink); overflow: hidden; }
+.pr::backdrop { background: var(--bg); }
+.pr:focus { outline: none; }
+.pr[open] { display: flex; flex-direction: column; }
+html.presentando { overflow: hidden; }
+.pr-progress { height: 4px; background: var(--line); flex: none; }
+.pr-progress span { display: block; height: 100%; width: 0; background: var(--real); transition: width .25s; }
+.pr-stage { flex: 1; min-height: 0; overflow: auto; display: flex; }
+.pr-slide { width: 100%; max-width: 1400px; margin: auto; padding: clamp(1.5rem, 4vh, 3rem) clamp(1.5rem, 5vw, 4.5rem) 4.5rem; }
+.pr-head { margin-bottom: clamp(1rem, 3vh, 2rem); }
+.pr-head h2 { font-size: clamp(2.2rem, 4.6vw, 3.8rem); }
+.pr-idea { font-family: var(--serif); font-size: clamp(1.15rem, 2.1vw, 1.7rem); color: var(--ink-2); max-width: 52ch; margin: .6rem 0 0; line-height: 1.45; }
+.pr-sub { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--ink-2); margin: 0 0 1rem; }
+.pr-meta { font-size: clamp(.95rem, 1.4vw, 1.15rem); color: var(--ink-2); margin: 1.2rem 0 0; }
+.pr-meta.small { font-size: .95rem; color: var(--ink-3); }
+.pr-cover { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; }
+.pr-cover h1 { font-size: clamp(3.2rem, 9vw, 7rem); max-width: 12ch; margin: .6rem 0 .4rem; }
+.pr-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; margin-bottom: 1.4rem; }
+.pr-tiles.n3 { grid-template-columns: repeat(3, 1fr); }
+.pr-tile { background: var(--surface); padding: clamp(1rem, 2.5vh, 1.8rem) clamp(1rem, 1.6vw, 1.6rem); display: grid; gap: .5rem; align-content: start; }
+.pr-tile .k { font-size: clamp(.9rem, 1.2vw, 1.1rem); color: var(--ink-2); }
+.pr-tile .v { font-family: var(--serif); font-weight: 700; font-size: clamp(2.2rem, 5vw, 4.4rem); line-height: 1; display: flex; align-items: center; gap: .4rem; }
+.pr-tile .v .of { font-size: .42em; color: var(--ink-3); font-weight: 400; }
+.pr-tile .s { font-size: clamp(.8rem, 1vw, .95rem); color: var(--ink-3); }
+.pr-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; counter-reset: paso; }
+.pr-step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(1.2rem, 3vh, 2rem) 1.4rem; }
+.pr-step .n { display: inline-grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--real); color: #fff; font-weight: 700; font-size: 1.2rem; }
+[data-theme="dark"] .pr-step .n { background: var(--real-text); color: #06101F; }
+.pr-step h3 { font-size: clamp(1.4rem, 2.4vw, 2rem); margin: .8rem 0 .5rem; }
+.pr-step p { font-size: clamp(1rem, 1.5vw, 1.25rem); color: var(--ink-2); margin: 0; line-height: 1.5; }
+.pr-points { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(.8rem, 2.4vh, 1.4rem); max-width: 60rem; }
+.pr-points li { font-family: var(--serif); font-size: clamp(1.15rem, 2.1vw, 1.7rem); line-height: 1.4; padding-left: 1.1rem; border-left: 4px solid var(--real); }
+.pr-cards { display: grid; gap: 1rem; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pr-cards.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pr-cards.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pr-cards.n1 { grid-template-columns: minmax(0, 32rem); }
+.pr-card, .pr-tcard { all: unset; box-sizing: border-box; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .55rem; transition: border-color .15s, box-shadow .15s; }
+.pr-card:hover, .pr-tcard:hover { border-color: var(--line-2); box-shadow: var(--shadow); }
+.pr-card:focus-visible, .pr-tcard:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.pr-card .top { display: flex; justify-content: space-between; align-items: baseline; gap: .4rem; }
+.pr-card .tk { font-weight: 700; font-size: clamp(1.2rem, 1.8vw, 1.6rem); }
+.pr-card .co { color: var(--ink-3); font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 12em; }
+.pr-card .nums { display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap; }
+.pr-card .big { font-family: var(--serif); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 700; line-height: 1; }
+.pr-card .hold { font-size: .95rem; color: var(--ink-3); }
+.pr-card .mini { position: relative; height: clamp(70px, 13vh, 120px); display: block; }
+.pr-card .frase { font-family: var(--serif); font-size: clamp(.98rem, 1.3vw, 1.15rem); line-height: 1.45; color: var(--ink); }
+.pr-chart { position: relative; height: 42vh; }
+.pr-chart.md { height: 36vh; }
+.pr-chart.lg { height: 52vh; }
+.pr-tec { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; }
+.pr-tcard { padding: .6rem .7rem; gap: .25rem; }
+.pr-tcard .tk { font-weight: 700; font-size: 1rem; }
+.pr-tcard .mini { position: relative; height: clamp(55px, 10vh, 95px); display: block; }
+.pr-tcard .vals { font-size: .74rem; color: var(--ink-2); line-height: 1.4; }
+.pr-concl { margin-top: 1.2rem; max-width: 60rem; }
+.pr-legal { font-size: .85rem; color: var(--ink-3); margin-top: 1.2rem; max-width: 70ch; }
+.pr-vacio { font-size: 1.2rem; color: var(--ink-2); }
+.pr-controls { position: absolute; right: 1rem; bottom: .8rem; display: flex; align-items: center; gap: .4rem; z-index: 2; }
+.pr-count { font-size: .85rem; color: var(--ink-3); margin: 0 .4rem; min-width: 3.5em; text-align: center; }
+.pr-btn { min-width: 44px; min-height: 44px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink);
+  font: 700 1rem var(--sans); cursor: pointer; opacity: .75; }
+.pr-btn:hover, .pr-btn:focus-visible { opacity: 1; }
+.pr-btn:disabled { opacity: .3; cursor: default; }
+.pr-notes { position: absolute; left: 1rem; right: 1rem; bottom: 4.2rem; max-height: 38vh; overflow: auto; z-index: 3;
+  background: var(--surface); border: 1px solid var(--line-2); border-left: 4px solid var(--hold); border-radius: var(--r); box-shadow: var(--shadow); padding: .9rem 1.2rem; }
+.pr-n-head { display: flex; justify-content: space-between; gap: 1rem; font-size: .85rem; color: var(--ink-2); margin-bottom: .4rem; font-weight: 700; }
+.pr-n-timer { font-size: 1.3rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pr-n-reset { all: unset; cursor: pointer; font-size: .75rem; color: var(--real-text); margin-left: .6rem; text-decoration: underline; }
+.pr-n-body { font-size: 1rem; line-height: 1.55; }
+.pr-n-body ul { margin: .3rem 0 0; padding-left: 1.2em; }
+@media (max-width: 1000px) { .pr-tiles, .pr-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pr-tec { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .pr-tiles, .pr-tiles.n3, .pr-cards, .pr-cards.n3, .pr-steps { grid-template-columns: 1fr; } .pr-tec { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .pr-progress span { transition: none; } }
+@media (max-width: 860px) { #presentar span { display: none; } #presentar { width: 44px; padding: 0; justify-content: center; } }
+/* ajustes de altura para proyectores de 720p */
+.pr-tecnico .pr-head, .pr-dolares .pr-head, .pr-stop .pr-head, .pr-semanal .pr-head { margin-bottom: .8rem; }
+.pr-tecnico .pr-head h2 { font-size: clamp(1.8rem, 3.4vw, 2.8rem); }
+.pr-tecnico .pr-idea { font-size: clamp(1rem, 1.6vw, 1.3rem); }
+@media (min-width: 1100px) { .pr-tec { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.pr-dolares .pr-tile { padding-top: .9rem; padding-bottom: .9rem; }
+.pr-dolares .pr-tile .v { font-size: clamp(1.8rem, 3.6vw, 3.2rem); }
+.pr-chart.md { height: 30vh; }
+.pr-chart.lg { height: 46vh; }
+/* en pantallas grandes, todo el modo escala con el ancho (las medidas están en rem) */
+html.presentando { font-size: clamp(18px, 1.2vw, 26px); }
+.pr-slide { max-width: 80rem; }

@@ -43,6 +43,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
         <span>Descargar Excel <small id="descarga-meta"></small></span>
       </a>
+      <button class="btn" id="presentar" type="button" title="Modo presentación (flechas para avanzar, N para notas, Esc para salir)">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M10 8.5l4 2-4 2z" fill="currentColor"/><path d="M12 16v4M8 20h8"/></svg>
+        <span>Presentar</span>
+      </button>
       <button class="btn icon-btn" id="tema" type="button" aria-label="Cambiar entre tema claro y oscuro" title="Tema claro / oscuro">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
       </button>
@@ -210,6 +214,24 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </div>
 </footer>
 
+<dialog id="presentacion" class="pr" aria-label="Modo presentación" tabindex="-1">
+  <div class="pr-progress" aria-hidden="true"><span></span></div>
+  <div class="pr-stage"></div>
+  <div class="pr-controls">
+    <button type="button" class="pr-btn pr-toggle-notes" title="Notas (N)" aria-label="Mostrar u ocultar notas">N</button>
+    <span class="pr-count" aria-hidden="true"></span>
+    <button type="button" class="pr-btn pr-prev" aria-label="Diapositiva anterior">&#8592;</button>
+    <button type="button" class="pr-btn pr-next" aria-label="Diapositiva siguiente">&#8594;</button>
+    <button type="button" class="pr-btn pr-close" aria-label="Salir del modo presentación (Esc)">&#10005;</button>
+  </div>
+  <aside class="pr-notes" hidden aria-label="Notas de la diapositiva">
+    <div class="pr-n-head"><span class="pr-n-bloque"></span><span class="pr-n-clock"><span class="pr-n-timer">00:00</span>
+      <button type="button" class="pr-n-reset" title="Reiniciar cronómetro">reiniciar</button></span></div>
+    <div class="pr-n-body"></div>
+  </aside>
+  <p class="pr-live sr-only" aria-live="polite"></p>
+</dialog>
+
 <dialog id="detalle" aria-labelledby="det-titulo">
   <div class="dlg-head">
     <div><h3 id="det-titulo"></h3><p class="muted small" id="det-sub" style="margin:.2rem 0 0"></p></div>
@@ -225,5 +247,6 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 <script src="data/datos.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/app.js"></script>
+<script src="js/presentacion.js"></script>
 </body>
 </html>

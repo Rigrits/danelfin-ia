@@ -922,6 +922,39 @@ def _leer_empresas(path: Path) -> dict | None:
     return out
 
 
+def _leer_presentacion(path: Path) -> dict | None:
+    """Lee web/contenido/presentacion.md: diapositivas "## N · Nombre" con campos "clave: valor" arriba
+    (los campos repetidos, como punto o caso, se juntan en una lista) y notas en Markdown debajo.
+    La sección "## Frases" trae una línea "TICKER: frase" por empresa."""
+    t = _leer_md(path)
+    if not t:
+        return None
+    repetibles = {"punto", "caso"}
+    out = {"diapositivas": [], "frases": {}}
+    for parte in re.split(r"^## +", t, flags=re.M)[1:]:
+        titulo, _, cuerpo = parte.partition("\n")
+        lineas = cuerpo.strip().split("\n")
+        if titulo.strip().lower() == "frases":
+            for ln in lineas:
+                m = re.match(r"\s*([A-Z][A-Z.\-]*)\s*:\s*(.+)", ln)
+                if m:
+                    out["frases"][m.group(1)] = m.group(2).strip()
+            continue
+        campos, i = {}, 0
+        while i < len(lineas):
+            m = re.match(r"\s*([a-záéíóú]+)\s*:\s*(.*)", lineas[i])
+            if not m:
+                break
+            k, v = m.group(1).lower(), m.group(2).strip()
+            if k in repetibles:
+                campos.setdefault(k, []).append(v)
+            else:
+                campos[k] = v
+            i += 1
+        out["diapositivas"].append(dict(nombre=titulo.strip(), notas="\n".join(lineas[i:]).strip(), **campos))
+    return out
+
+
 def resumen_web(rows) -> dict:
     done = [r for r in rows if r["real"] is not None]
     n = len(done)
@@ -1044,7 +1077,8 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
         meta=meta, resumen=resumen_web(rows), acciones=acciones, viernes=[_d(f) for f in fridays],
         contenido=dict(danelfin=_leer_md(site_dir / "contenido" / "danelfin.md"),
                        conclusiones=_leer_md(site_dir / "contenido" / "conclusiones.md"),
-                       empresas=_leer_empresas(site_dir / "contenido" / "empresas.md")),
+                       empresas=_leer_empresas(site_dir / "contenido" / "empresas.md"),
+                       presentacion=_leer_presentacion(site_dir / "contenido" / "presentacion.md")),
     )
     out = site_dir / "data" / "datos.js"
     out.parent.mkdir(parents=True, exist_ok=True)
