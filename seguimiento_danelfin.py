@@ -980,7 +980,7 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
                  winrate=r["winrate"], avgret=r["avgret"], entrada=r["entry"], sl=r["sl"], tp=r["tp"],
                  fuente=r["source"], notas=r["notes"], estadoTexto=r["status"],
                  real=_n(r["real"]), hold=_n(r["hold"]), recupero=r["recovered"], salida=None,
-                 viernes=[], serie=[], indicadores=[], fechaEntrada=None, ultimo=None,
+                 viernes=[], serie=[], indicadores=[], pre=[], fechaEntrada=None, ultimo=None,
                  spyReal=None, spyHold=None, alphaReal=None, alphaHold=None)
         if r["real"] is None:
             a["estado"] = "nueva"
@@ -1020,6 +1020,14 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
                 adx=_n(q["ADX"], 2), pdi=_n(q["+DI"], 2), mdi=_n(q["-DI"], 2), rsi=_n(q["RSI"], 2), mfi=_n(q["MFI"], 2),
                 macd=_n(q["MACD"], 3), senal=_n(q["MACD_signal"], 3), hist=_n(q["MACD_hist"], 3),
                 ema20=_n(q["EMA20"], 2), ema50=_n(q["EMA50"], 2), ema200=_n(q["EMA200"], 2), conds=conds))
+        # Historia técnica previa a la recomendación (~6 meses hasta el cierre previo a la entrada):
+        # lo que se podía ver el día en que Danelfin publicó la idea.
+        ind = data[r["t"]]["ind"]
+        for d_, q in ind.loc[:r["snaps"][0]["date"]].tail(126).iterrows():
+            a["pre"].append(dict(
+                d=_d(d_), c=_n(q["close"], 2), e20=_n(q["EMA20"], 2), e50=_n(q["EMA50"], 2), e200=_n(q["EMA200"], 2),
+                rsi=_n(q["RSI"], 1), mfi=_n(q["MFI"], 1), adx=_n(q["ADX"], 1), pdi=_n(q["+DI"], 1), mdi=_n(q["-DI"], 1),
+                hist=_n(q["MACD_hist"], 3)))
         acciones.append(a)
 
     meta = dict(

@@ -239,9 +239,50 @@
   }
 
   /* ------------------------------------------------------------ indicadores y benchmark */
-  function zone(v, hi, lo, hiT, loT) { return v >= hi ? '<span class="zone">' + hiT + '</span>' : v <= lo ? '<span class="zone">' + loT + '</span>' : ''; }
-  function adxZone(v) { return '<span class="zone">' + (v < 20 ? 'sin tendencia' : v < 25 ? 'débil' : v < 40 ? 'tendencia' : 'fuerte') + '</span>'; }
   function entradaSnap(a) { return a.indicadores.filter(function (s) { return s.momento.indexOf('Al entrar') === 0; })[0]; }
+
+  /* ------------------------------------------------------------ fichas técnicas al recomendar */
+  var tecCharts = [];
+  function renderTecnicas() {
+    tecCharts.forEach(destroy); tecCharts = [];
+    var host = $('#tecnicas'), h = '';
+    var dist = function (c, m) { return m ? Fmt.pct(c / m - 1, 1) : '—'; };
+    var v = function (k, val) { return '<div class="tv"><span class="k">' + k + '</span><span class="v">' + val + '</span></div>'; };
+    D.acciones.forEach(function (a) {
+      var s = entradaSnap(a);
+      if (!s || !a.pre || !a.pre.length) return;
+      h += '<article class="tecnica" data-id="' + esc(a.id) + '">' +
+        '<header><div><span class="tk">' + esc(a.etiqueta) + '</span> <span class="co">' + esc(a.empresa) + '</span></div>' +
+        '<span class="muted small">Recomendada el ' + Fmt.date(a.fechaRec) + ' · dato al cierre del ' + Fmt.date(s.fecha) + '</span></header>' +
+        '<div class="tec-chart"><canvas role="img" aria-label="Precio de ' + esc(a.ticker) + ' y medias de 20, 50 y 200 ruedas en los seis meses previos a la recomendación"></canvas></div>' +
+        '<div class="tec-vals">' +
+          v('Cierre', Fmt.n2(s.cierre)) + v('vs EMA 20', dist(s.cierre, s.ema20)) + v('vs EMA 50', dist(s.cierre, s.ema50)) + v('vs EMA 200', dist(s.cierre, s.ema200)) +
+          v('RSI', Fmt.n1(s.rsi)) + v('MFI', Fmt.n1(s.mfi)) + v('ADX', Fmt.n1(s.adx)) + v('+DI / −DI', Fmt.n1(s.pdi) + ' / ' + Fmt.n1(s.mdi)) +
+          v('MACD', Fmt.n2(s.macd)) + v('Señal', Fmt.n2(s.senal)) + v('Histograma', Fmt.n2(s.hist)) + v('Resultado real', gl(a.real)) +
+        '</div>' +
+        '<details class="tec-osc"><summary>Ver osciladores (RSI, MFI, ADX y DI)</summary>' +
+          '<div class="legend"><span><i style="border-color:var(--real)"></i>RSI</span><span><i class="dash" style="border-color:var(--hold)"></i>MFI</span></div>' +
+          '<div class="tec-chart sm"><canvas role="img" aria-label="RSI y MFI de ' + esc(a.ticker) + '"></canvas></div>' +
+          '<div class="legend"><span><i style="border-color:var(--ink)"></i>ADX</span><span><i style="border-color:var(--gain)"></i>+DI</span><span><i class="dash" style="border-color:var(--loss)"></i>−DI</span></div>' +
+          '<div class="tec-chart sm"><canvas role="img" aria-label="ADX, +DI y −DI de ' + esc(a.ticker) + '"></canvas></div>' +
+        '</details></article>';
+    });
+    host.innerHTML = h ? '<div class="legend"><span><i style="border-color:var(--ink)"></i>Cierre</span><span><i style="border-color:var(--real)"></i>EMA 20</span>' +
+      '<span><i class="dash" style="border-color:var(--hold)"></i>EMA 50</span><span><i class="dot" style="border-color:var(--spy)"></i>EMA 200</span></div>' +
+      '<div class="tec-grid">' + h + '</div>' : '';
+    $$('.tecnica', host).forEach(function (art) {
+      var a = byId(art.getAttribute('data-id'));
+      var c = Charts.tecPrecio($('.tec-chart canvas', art), a); if (c) tecCharts.push(c);
+      var det = $('.tec-osc', art);
+      det.addEventListener('toggle', function () {            // los osciladores se dibujan recién al abrirlos
+        if (det.open && !det._dibujado) {
+          var cvs = $$('canvas', det);
+          Charts.tecOsc(cvs[0], cvs[1], a).forEach(function (x) { tecCharts.push(x); });
+          det._dibujado = true;
+        }
+      });
+    });
+  }
 
   function renderIndicadores() {
     makeTable($('#ind-entrada-wrap'), {
@@ -251,14 +292,14 @@
         { key: 'ticker', label: 'Ticker', val: function (a) { return a.ticker; }, cell: tkBtn },
         { key: 'fecha', label: 'Recomendada', val: function (a) { return a.fechaRec; }, cell: function (a) { return Fmt.date(a.fechaRec); } },
         { key: 'res', label: 'Resultado', left: true, val: function (a) { return a.real; }, cell: function (a) { return gl(a.real); } },
-        { key: 'adx', label: 'ADX', val: function (a) { return entradaSnap(a).adx; }, cell: function (a) { var s = entradaSnap(a); return Fmt.n1(s.adx) + adxZone(s.adx); } },
+        { key: 'adx', label: 'ADX', val: function (a) { return entradaSnap(a).adx; }, cell: function (a) { return Fmt.n1(entradaSnap(a).adx); } },
         { key: 'pdi', label: '+DI', val: function (a) { return entradaSnap(a).pdi; }, cell: function (a) { return Fmt.n1(entradaSnap(a).pdi); } },
         { key: 'mdi', label: '−DI', val: function (a) { return entradaSnap(a).mdi; }, cell: function (a) { return Fmt.n1(entradaSnap(a).mdi); } },
-        { key: 'rsi', label: 'RSI', val: function (a) { return entradaSnap(a).rsi; }, cell: function (a) { var s = entradaSnap(a); return Fmt.n1(s.rsi) + zone(s.rsi, 70, 30, 'sobrecompra', 'sobreventa'); } },
-        { key: 'mfi', label: 'MFI', val: function (a) { return entradaSnap(a).mfi; }, cell: function (a) { var s = entradaSnap(a); return Fmt.n1(s.mfi) + zone(s.mfi, 80, 20, 'sobrecompra', 'sobreventa'); } },
-        { key: 'hist', label: 'Hist. MACD', val: function (a) { return entradaSnap(a).hist; }, cell: function (a) { var h = entradaSnap(a).hist; return '<span class="gl ' + (h > 0 ? 'up' : 'down') + '">' + I[h > 0 ? 'up' : 'down'] + Fmt.n2(h) + '</span>'; } },
-        { key: 'ema', label: 'Cierre vs EMA 50', left: true, val: function (a) { var s = entradaSnap(a); return s.cierre / s.ema50; }, cell: function (a) { var s = entradaSnap(a); return s.cierre > s.ema50 ? 'Sobre la EMA 50' : 'Bajo la EMA 50'; } },
-        { key: 'conds', label: 'Condiciones alcistas', val: function (a) { return entradaSnap(a).conds; }, cell: function (a) { return entradaSnap(a).conds + ' de 5'; } }
+        { key: 'rsi', label: 'RSI', val: function (a) { return entradaSnap(a).rsi; }, cell: function (a) { return Fmt.n1(entradaSnap(a).rsi); } },
+        { key: 'mfi', label: 'MFI', val: function (a) { return entradaSnap(a).mfi; }, cell: function (a) { return Fmt.n1(entradaSnap(a).mfi); } },
+        { key: 'hist', label: 'Hist. MACD', val: function (a) { return entradaSnap(a).hist; }, cell: function (a) { return Fmt.n2(entradaSnap(a).hist); } },
+        { key: 'ema', label: 'vs EMA 50', val: function (a) { var s = entradaSnap(a); return s.cierre / s.ema50 - 1; }, cell: function (a) { var s = entradaSnap(a); return Fmt.pct(s.cierre / s.ema50 - 1, 1); } },
+        { key: 'e200', label: 'vs EMA 200', val: function (a) { var s = entradaSnap(a); return s.cierre / s.ema200 - 1; }, cell: function (a) { var s = entradaSnap(a); return Fmt.pct(s.cierre / s.ema200 - 1, 1); } }
       ]
     });
 
@@ -282,7 +323,6 @@
         { key: 'e20', label: 'EMA 20', cell: function (s) { return Fmt.n2(s.ema20); } },
         { key: 'e50', label: 'EMA 50', cell: function (s) { return Fmt.n2(s.ema50); } },
         { key: 'e200', label: 'EMA 200', cell: function (s) { return Fmt.n2(s.ema200); } },
-        { key: 'conds', label: 'Cond. alcistas', cell: function (s) { return s.conds + ' de 5'; } },
         { key: 'pos', label: 'Posición', left: true, cell: function (s) { return '<span class="tag">' + esc(s.pos) + '</span>'; } }
       ]
     });
@@ -345,8 +385,7 @@
       'ADX, +DI y −DI: ' + p.adx + ' períodos (suavizado de Wilder)',
       'RSI: ' + p.rsi + ' períodos; MFI: ' + p.mfi + ' períodos',
       'MACD: ' + p.macd.join(' / ') + ' (rápida / lenta / señal)',
-      'Medias exponenciales: ' + p.emas.join(', ') + ' ruedas',
-      'Condiciones alcistas (0 a 5): cierre sobre la EMA 50, +DI mayor que −DI, RSI mayor que 50, MFI mayor que 50 y MACD sobre su señal'
+      'Medias exponenciales: ' + p.emas.join(', ') + ' ruedas'
     ].map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
     if (D.meta.avisos && D.meta.avisos.length) {
       $('#avisos').innerHTML = D.meta.avisos.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
@@ -438,7 +477,7 @@
     var nx = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nx);
     try { localStorage.setItem('tema', nx); } catch (e) {}
-    renderGrid(); renderPanels();
+    renderGrid(); renderPanels(); renderTecnicas();
     if (dlg.open) { var a = byId(dlg.getAttribute('data-id')); if (a) drawDetail(a); }
   });
 
@@ -457,6 +496,6 @@
   /* ------------------------------------------------------------ arranque */
   renderHeader(); renderHero(); renderDanelfin();
   renderGrid(); renderPanels(); renderTablaResultados();
-  renderEmpresas(); renderIndicadores(); renderMetodologia(); renderPie();
+  renderEmpresas(); renderTecnicas(); renderIndicadores(); renderMetodologia(); renderPie();
   $('#det-cuerpo').addEventListener('click', function (e) { var b = e.target.closest('#det-ficha'); if (b) irAFicha(b.getAttribute('data-tk')); });
 })();

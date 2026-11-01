@@ -35,7 +35,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       <a href="#danelfin">Danelfin</a>
       <a href="#resultados">Resultados</a>
       <a href="#empresas">Empresas</a>
-      <a href="#indicadores">Indicadores</a>
+      <a href="#indicadores">Técnico</a>
       <a href="#metodologia">Metodología</a>
     </nav>
     <div class="header-actions">
@@ -149,11 +149,22 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <section id="indicadores" aria-labelledby="h-indicadores">
     <div class="wrap">
       <div class="section-head">
-        <p class="eyebrow">Contraste</p>
-        <h2 id="h-indicadores">Indicadores técnicos y benchmark</h2>
-        <p>¿Las acciones que perdieron ya mostraban debilidad técnica cuando Danelfin dijo BUY? Lectura con el cierre previo a la entrada. Con tan pocos casos es descriptivo, no estadístico.</p>
+        <p class="eyebrow">Al momento de la recomendación</p>
+        <h2 id="h-indicadores">Cómo estaba cada acción técnicamente</h2>
+        <p>La foto técnica del cierre previo a cada recomendación, con los seis meses anteriores: lo que se podía ver el día en que Danelfin publicó la idea. Se muestran los datos, sin una lectura predeterminada.</p>
       </div>
-      <div class="table-wrap flush" id="ind-entrada-wrap"></div>
+      <details class="glosario">
+        <summary>Qué mide cada indicador</summary>
+        <div class="details-body"><dl>
+          <dt>EMA 20, 50 y 200</dt><dd>Medias móviles exponenciales del precio de cierre de las últimas 20, 50 y 200 ruedas (corto, mediano y largo plazo). La distancia del precio a cada media indica cuánto se apartó de su promedio.</dd>
+          <dt>RSI (14)</dt><dd>Índice de fuerza relativa: compara las subas y las bajas de las últimas 14 ruedas en una escala de 0 a 100.</dd>
+          <dt>MFI (14)</dt><dd>Índice de flujo de dinero: como el RSI, pero pondera cada rueda por el volumen operado. Escala de 0 a 100.</dd>
+          <dt>ADX, +DI y −DI (14)</dt><dd>+DI y −DI miden la fuerza de los movimientos al alza y a la baja; el ADX mide la intensidad de la tendencia, sin importar su dirección.</dd>
+          <dt>MACD (12, 26, 9)</dt><dd>Diferencia entre las medias exponenciales de 12 y 26 ruedas; el histograma es la distancia entre esa diferencia y su propia media de 9 ruedas (la señal).</dd>
+        </dl></div>
+      </details>
+      <div class="tecnicas" id="tecnicas"></div>
+      <div class="table-wrap" id="ind-entrada-wrap"></div>
 
       <div class="controls" style="margin-top:2rem">
         <div class="group"><label class="lbl" for="ind-ticker">Evolución de</label>

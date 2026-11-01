@@ -280,3 +280,25 @@ details[open] summary { border-bottom: 1px solid var(--line); }
 .ficha .prose { font-size: .98rem; max-width: none; }
 .ficha .prose p { margin-bottom: .8rem; }
 .linkbtn.small { font-size: .88rem; }
+
+/* ------------------------------------------------------------ técnico al recomendar */
+.glosario { margin-bottom: 1.2rem; }
+.glosario dl { margin: 0; display: grid; gap: .4rem; }
+.glosario dt { font-weight: 700; }
+.glosario dd { margin: 0 0 .4rem; color: var(--ink-2); }
+.tec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+@media (max-width: 900px) { .tec-grid { grid-template-columns: 1fr; } }
+.tecnica { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 1rem 1.1rem; }
+.tecnica header { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.tecnica .tk { font-weight: 700; font-size: 1.15rem; }
+.tecnica .co { color: var(--ink-3); font-size: .88rem; }
+.tec-chart { position: relative; height: 200px; margin-bottom: .7rem; }
+.tec-chart.sm { height: 150px; }
+.tec-vals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem .8rem; }
+@media (max-width: 520px) { .tec-vals { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tv { display: grid; }
+.tv .k { font-size: .72rem; color: var(--ink-3); }
+.tv .v { font-weight: 700; font-size: .95rem; }
+.tec-osc { border: 0; background: transparent; margin: .6rem 0 0; }
+.tec-osc summary { padding: .3rem 0; min-height: 44px; display: flex; align-items: center; color: var(--real-text); }
+.tec-osc[open] summary { border-bottom: 0; }

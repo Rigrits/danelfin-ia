@@ -265,6 +265,57 @@
       options: o, plugins: [valueLabels] });
   }
 
+  /* ---------------------------------------------------------------- técnico al recomendar */
+  // Precio y medias de los ~6 meses previos a la recomendación (solo lo que se veía ese día).
+  function tecPrecio(canvas, a) {
+    var t = theme(), p = a.pre;
+    if (!p || !p.length) return null;
+    var labels = p.map(function (x) { return x.d; });
+    var ds = function (label, key, color, width, dash) {
+      return { label: label, data: p.map(function (x) { return x[key]; }), borderColor: color, borderWidth: width,
+        borderDash: dash, pointRadius: 0, pointHoverRadius: 3, tension: .1, fill: false };
+    };
+    var o = base(t);
+    o.interaction = { mode: 'index', intersect: false };
+    o.plugins = { legend: { display: false },
+      tooltip: { callbacks: { title: function (i) { return Fmt.date(i[0].label); },
+        label: function (it) { return it.dataset.label + ': ' + Fmt.n2(it.parsed.y); } } } };
+    o.scales = {
+      x: { ticks: { color: t.ink3, maxTicksLimit: 6, callback: function (v) { return Fmt.dm(this.getLabelForValue(v)); } }, grid: { display: false } },
+      y: { ticks: { color: t.ink3, callback: function (v) { return Fmt.n2(v); } }, grid: { color: t.line }, border: { display: false } }
+    };
+    return new Chart(canvas, { type: 'line', data: { labels: labels, datasets: [
+      ds('Cierre', 'c', t.ink, 2.2),
+      ds('EMA 20', 'e20', t.real, 1.6),
+      ds('EMA 50', 'e50', t.hold, 1.6, [6, 4]),
+      ds('EMA 200', 'e200', t.spy, 1.6, [2, 3])
+    ] }, options: o });
+  }
+  // Osciladores: RSI y MFI (0-100) en un gráfico; ADX, +DI y -DI en otro. Sin líneas de umbral.
+  function tecOsc(cvA, cvB, a) {
+    var t = theme(), p = a.pre, out = [];
+    if (!p || !p.length) return out;
+    var labels = p.map(function (x) { return x.d; });
+    var mk = function (canvas, sets, yOpt) {
+      var o = base(t);
+      o.interaction = { mode: 'index', intersect: false };
+      o.plugins = { legend: { display: false },
+        tooltip: { callbacks: { title: function (i) { return Fmt.date(i[0].label); },
+          label: function (it) { return it.dataset.label + ': ' + Fmt.n1(it.parsed.y); } } } };
+      o.scales = {
+        x: { ticks: { color: t.ink3, maxTicksLimit: 6, callback: function (v) { return Fmt.dm(this.getLabelForValue(v)); } }, grid: { display: false } },
+        y: Object.assign({ ticks: { color: t.ink3 }, grid: { color: t.line }, border: { display: false } }, yOpt)
+      };
+      return new Chart(canvas, { type: 'line', data: { labels: labels, datasets: sets.map(function (s) {
+        return { label: s[0], data: p.map(function (x) { return x[s[1]]; }), borderColor: s[2], borderWidth: 1.8,
+          borderDash: s[3], pointRadius: 0, pointHoverRadius: 3, tension: .1, fill: false };
+      }) }, options: o });
+    };
+    out.push(mk(cvA, [['RSI', 'rsi', t.real], ['MFI', 'mfi', t.hold, [6, 4]]], { min: 0, max: 100 }));
+    out.push(mk(cvB, [['ADX', 'adx', t.ink], ['+DI', 'pdi', t.gain], ['−DI', 'mdi', t.loss, [6, 4]]], { min: 0 }));
+    return out;
+  }
+
   window.Fmt = Fmt;
-  window.Charts = { mini: mini, detalle: detalle, barras: barras, semanal: semanal, alpha: alpha };
+  window.Charts = { mini: mini, detalle: detalle, barras: barras, semanal: semanal, alpha: alpha, tecPrecio: tecPrecio, tecOsc: tecOsc };
 })();
