@@ -106,8 +106,10 @@
         c.mesh.scale.y = Math.max(.001, k);
         c.vl.material.opacity = reduce ? 1 : ease((t - 1 - c.delay) / .6);
       });
-      var ang = reduce ? .35 : .35 + Math.sin(t * .18) * .42;        // órbita lenta de ida y vuelta
-      m.camera.position.set(Math.sin(ang) * R, 3.6 + Math.sin(t * .25) * .3, Math.cos(ang) * R);
+      // entrada en vuelo (de lejos y de arriba) y después giro continuo alrededor de las columnas
+      var k0 = reduce ? 1 : ease(t / 3), r = R + (1 - k0) * 16, alto = 3.6 + (1 - k0) * 9;
+      var ang = reduce ? .35 : -.9 + k0 * 1.25 + Math.max(0, t - 3) * .17;
+      m.camera.position.set(Math.sin(ang) * r, alto + Math.sin(t * .4) * .5, Math.cos(ang) * r);
       m.camera.lookAt(0, -.4, 0);
       m.renderer.render(m.scene, m.camera);
       if (!reduce) raf.id = requestAnimationFrame(frame);
@@ -146,7 +148,7 @@
       barras.forEach(function (b) { b.mesh.scale.y = reduce ? 1 : Math.max(.001, ease((t - .2 - b.delay) / 1)); });
       var p, pos = new T.Vector3(), mira = new T.Vector3();
       if (reduce || t > dur + 1.6) {                                   // vista final: toda la brecha, con vaivén suave
-        var tt = reduce ? 0 : t - dur - 1.6, ang = .32 + Math.sin(tt * .2) * .18;
+        var tt = reduce ? 0 : t - dur - 1.6, ang = .32 + Math.sin(tt * .45) * .55;
         var d = dFin(); pos.set(Math.sin(ang) * d, d * .42, Math.cos(ang) * d); mira.set(0, -1.3, 0);
       } else if (t > dur) {                                            // se aleja hasta la vista final
         p = ease((t - dur) / 1.6);
