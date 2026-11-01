@@ -253,7 +253,7 @@ details[open] summary { border-bottom: 1px solid var(--line); }
 .site-footer strong { color: var(--ink); }
 .notice { background: var(--loss-bg); border: 1px solid var(--loss); color: var(--ink); padding: 1.2rem; border-radius: var(--r); margin: 2rem 0; }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } html:not(.forzar-mov) * { transition: none !important; animation: none !important; } }
 @media print {
   .site-header, .controls, .btn, dialog { display: none !important; }
   body { background: #fff; color: #000; } section { break-inside: avoid; }
@@ -392,4 +392,64 @@ html.presentando { overflow: hidden; }
 .pr-chart.lg { height: 46vh; }
 /* en pantallas grandes, todo el modo escala con el ancho (las medidas están en rem) */
 html.presentando { font-size: clamp(18px, 1.2vw, 26px); }
-.pr-slide { max-width: 80rem; }
+
+/* ------------------------------------------------------------ identidad y movimiento */
+.pr, .pr::backdrop { background: radial-gradient(ellipse 80% 60% at 75% 10%, #13244A 0%, transparent 60%),
+  radial-gradient(ellipse 70% 60% at 10% 100%, #0E1D3A 0%, transparent 65%), #070D1A; }
+.pr::before { content: ""; position: absolute; left: -50%; right: -50%; bottom: -10%; height: 60%; pointer-events: none; z-index: 0;
+  background-image: linear-gradient(rgba(127,169,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(127,169,255,.07) 1px, transparent 1px);
+  background-size: 64px 64px; background-position: calc(var(--viaje, 0) * -48px) 0;
+  transform: perspective(600px) rotateX(62deg); transform-origin: 50% 100%;
+  mask-image: linear-gradient(to top, #000 0%, transparent 85%); -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 85%);
+  transition: background-position .9s cubic-bezier(.22,.61,.36,1); }
+.pr .pr-progress, .pr .pr-controls, .pr .pr-notes { position: relative; z-index: 2; }
+.pr .pr-controls, .pr .pr-notes { position: absolute; }
+.pr-stage { position: relative; z-index: 1; overflow: hidden; display: block; perspective: 1600px; perspective-origin: 50% 40%; }
+.pr-slide { position: absolute; inset: 0; max-width: none; margin: 0; padding: 0; overflow: auto; display: flex;
+  transform-style: preserve-3d; backface-visibility: hidden; will-change: transform, opacity; }
+.pr-inner { position: relative; width: 100%; max-width: 80rem; margin: auto; padding: clamp(1.5rem, 4vh, 3rem) clamp(1.5rem, 5vw, 4.5rem) 4.5rem; }
+.pr-tile, .pr-step, .pr-card, .pr-tcard, .pr-notes { background: rgba(20, 30, 52, .78); border-color: rgba(127,169,255,.16);
+  box-shadow: 0 18px 40px -18px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05); }
+.pr-tiles { background: transparent; border: 0; gap: 1rem; overflow: visible; }
+.pr-tile { border: 1px solid rgba(127,169,255,.16); border-radius: var(--r); }
+.pr-card:hover, .pr-tcard:hover { border-color: rgba(127,169,255,.45); box-shadow: 0 24px 50px -18px rgba(0,0,0,.8), 0 0 0 1px rgba(127,169,255,.2); transform: translateY(-3px); }
+.pr-card, .pr-tcard { transition: border-color .2s, box-shadow .2s, transform .2s, opacity .5s, translate .5s; }
+
+/* viaje de cámara: la diapositiva nueva llega desde la profundidad, la vieja se va hacia el costado */
+@keyframes prEntraAdelante { from { opacity: 0; transform: translate3d(38%, 0, -700px) rotateY(-28deg); } to { opacity: 1; transform: none; } }
+@keyframes prSaleAdelante { from { opacity: 1; transform: none; } 55% { opacity: 0; } to { opacity: 0; transform: translate3d(-42%, 0, -800px) rotateY(30deg); } }
+@keyframes prEntraAtras { from { opacity: 0; transform: translate3d(-38%, 0, -700px) rotateY(28deg); } to { opacity: 1; transform: none; } }
+@keyframes prSaleAtras { from { opacity: 1; transform: none; } 55% { opacity: 0; } to { opacity: 0; transform: translate3d(42%, 0, -800px) rotateY(-30deg); } }
+.pr-slide.entra-adelante { animation: prEntraAdelante .85s cubic-bezier(.22,.61,.36,1) .12s both; }
+.pr-slide.sale-adelante { animation: prSaleAdelante .75s cubic-bezier(.4,0,.6,1) both; pointer-events: none; }
+.pr-slide.entra-atras { animation: prEntraAtras .85s cubic-bezier(.22,.61,.36,1) .12s both; }
+.pr-slide.sale-atras { animation: prSaleAtras .75s cubic-bezier(.4,0,.6,1) both; pointer-events: none; }
+
+/* entradas escalonadas en los momentos clave */
+@keyframes prSube { from { opacity: 0; transform: translateY(28px) scale(.97); } to { opacity: 1; transform: none; } }
+.pr-clave .pr-head, .pr-clave .pr-cover > *, .pr-clave .pr-tile, .pr-clave .pr-sub { animation: prSube .7s cubic-bezier(.22,.61,.36,1) both; }
+.pr-clave .pr-cover > :nth-child(2), .pr-clave .pr-tile:nth-child(1) { animation-delay: .35s; }
+.pr-clave .pr-cover > :nth-child(3), .pr-clave .pr-tile:nth-child(2) { animation-delay: .5s; }
+.pr-clave .pr-cover > :nth-child(4), .pr-clave .pr-tile:nth-child(3) { animation-delay: .65s; }
+.pr-clave .pr-cover > :nth-child(5), .pr-clave .pr-tile:nth-child(4) { animation-delay: .8s; }
+
+/* revelado por partes */
+.pr-rev { opacity: .08; translate: 0 18px; filter: saturate(.3); transition: opacity .5s, translate .5s cubic-bezier(.22,.61,.36,1), filter .5s; }
+.pr-rev.vis { opacity: 1; translate: 0 0; filter: none; }
+
+/* escenas 3D */
+.pr-3d { position: relative; }
+.pr-3d canvas { display: block; width: 100% !important; height: 100% !important; }
+.pr-3d-portada { position: absolute; inset: 6% 0 6% 47%; z-index: 0; }
+.pr-portada .pr-cover { position: relative; z-index: 1; pointer-events: none; }
+.pr-portada .pr-cover a { pointer-events: auto; }
+.pr-portada .pr-cover h1, .pr-portada .pr-cover .pr-idea { text-shadow: 0 2px 24px rgba(7,13,26,.9); }
+.pr-3d-resultados { height: 46vh; margin-top: .4rem; border-radius: var(--r); }
+.pr-3d-resultados.sin-3d, .pr-3d-resultados:has(.pr-chart) { height: auto; }
+.pr-3d-portada.sin-3d { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html:not(.forzar-mov) :is(.pr-slide, .pr-clave .pr-head, .pr-clave .pr-cover > *, .pr-clave .pr-tile, .pr-clave .pr-sub) { animation: none !important; }
+  html:not(.forzar-mov) .pr-rev { transition: none; translate: none; }
+  html:not(.forzar-mov) .pr::before { transition: none; }
+}

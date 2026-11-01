@@ -128,7 +128,8 @@
     return { ticks: { color: t.ink3, callback: function (v) { return Fmt.pct(v, 0); } }, grid: { color: t.line }, border: { display: false } };
   }
   function base(t) {
-    return { responsive: true, maintainAspectRatio: false, animation: anim, color: t.ink2,
+    return { responsive: true, maintainAspectRatio: false,
+      animation: window.Charts && window.Charts.lento ? { duration: 1100, easing: 'easeOutQuart' } : anim, color: t.ink2,
       font: { family: '"Atkinson Hyperlegible", system-ui, sans-serif', size: 12 } };
   }
 
