@@ -301,6 +301,43 @@
   }
 
   /* ------------------------------------------------------------ metodología y pie */
+  /* ------------------------------------------------------------ empresas */
+  function renderEmpresas() {
+    var E = D.contenido && D.contenido.empresas;
+    if (!E || !window.marked) return;
+    var cg = E.contexto;
+    if (cg) {
+      $('#contexto-general').innerHTML = '<h3>' + esc(cg.titulo) + '</h3>' +
+        (cg.bajada ? '<p class="bajada">' + esc(cg.bajada) + '</p>' : '') + '<div class="prose">' + marked.parse(cg.cuerpo) + '</div>';
+      $('#contexto-general').hidden = false;
+    }
+    var vistos = {}, h = '';
+    D.acciones.forEach(function (a) {
+      var f = E.fichas[a.ticker];
+      if (!f || vistos[a.ticker]) return;
+      vistos[a.ticker] = true;
+      var recs = D.acciones.filter(function (x) { return x.ticker === a.ticker; });
+      h += '<article class="ficha" id="empresa-' + esc(a.ticker) + '">' +
+        '<header><div><span class="tk">' + esc(a.ticker) + '</span> <span class="co">' + esc(a.empresa) + '</span></div>' +
+        '<div class="ficha-res">' + recs.map(function (x) { return badge(x) + ' ' + gl(x.real); }).join(' ') + '</div></header>' +
+        (f.bajada ? '<p class="bajada">' + esc(f.bajada) + '</p>' : '') +
+        '<details><summary>Leer la ficha completa</summary><div class="prose">' + marked.parse(f.cuerpo) + '</div></details>' +
+        '<button type="button" class="linkbtn small" data-id="' + esc(a.id) + '">Ver el gráfico y los números</button>' +
+        '</article>';
+    });
+    if (!h) return;
+    $('#fichas').innerHTML = h;
+    $('#empresas').hidden = false;
+    $('#fichas').addEventListener('click', function (e) { var b = e.target.closest('button[data-id]'); if (b) openDetail(b.getAttribute('data-id')); });
+  }
+  function irAFicha(ticker) {
+    var el = document.getElementById('empresa-' + ticker); if (!el) return;
+    if (dlg.open) dlg.close();
+    var d = el.querySelector('details'); if (d) d.open = true;
+    el.scrollIntoView({ block: 'start' });
+    el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true });
+  }
+
   function renderMetodologia() {
     $('#supuestos').innerHTML = D.meta.supuestos.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
     var p = D.meta.params;
@@ -339,6 +376,8 @@
       stat('G/P real sobre ' + Fmt.usd(D.meta.capital, 0, false), glUsd(a.pnlReal, 2)) +
       stat('G/P hold sobre ' + Fmt.usd(D.meta.capital, 0, false), glUsd(a.pnlHold, 2)) + '</div>';
     h += callout(a);
+    var fe = D.contenido && D.contenido.empresas && D.contenido.empresas.fichas[a.ticker];
+    if (fe) h += '<p class="small"><button type="button" class="linkbtn" id="det-ficha" data-tk="' + esc(a.ticker) + '">Leer la ficha de ' + esc(a.empresa) + ' (qué hace y qué pasó)</button></p>';
     h += '<div class="dlg-chart"><canvas id="ch-detalle" role="img" aria-label="Precio diario de ' + esc(a.ticker) + ' con entrada, stop loss, take profit y salida"></canvas></div>';
     h += '<p class="muted small">Línea azul: cierre diario hasta la salida (gris punteada: lo que habría pasado después). Banda azul clara: rango diario mínimo–máximo. ✕: salida simulada.</p>';
     h += '<div class="table-wrap flush"><div class="tcap">Viernes desde la entrada</div><div class="scroll"><table><thead><tr><th scope="col">Viernes</th><th scope="col">Cierre</th><th scope="col">Real</th><th scope="col">Hold</th><th scope="col">S&amp;P 500</th></tr></thead><tbody>' +
@@ -418,5 +457,6 @@
   /* ------------------------------------------------------------ arranque */
   renderHeader(); renderHero(); renderDanelfin();
   renderGrid(); renderPanels(); renderTablaResultados();
-  renderIndicadores(); renderMetodologia(); renderPie();
+  renderEmpresas(); renderIndicadores(); renderMetodologia(); renderPie();
+  $('#det-cuerpo').addEventListener('click', function (e) { var b = e.target.closest('#det-ficha'); if (b) irAFicha(b.getAttribute('data-tk')); });
 })();

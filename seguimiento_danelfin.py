@@ -900,6 +900,28 @@ def _leer_md(path: Path) -> str | None:
     return t or None
 
 
+def _leer_empresas(path: Path) -> dict | None:
+    """Lee web/contenido/empresas.md: secciones "## TICKER · Nombre" con una primera línea "bajada:".
+    Una sección sin ticker (p. ej. "## Contexto general") es el contexto común."""
+    t = _leer_md(path)
+    if not t:
+        return None
+    out = {"contexto": None, "fichas": {}}
+    for parte in re.split(r"^## +", t, flags=re.M)[1:]:
+        titulo, _, cuerpo = parte.partition("\n")
+        titulo, cuerpo, bajada = titulo.strip(), cuerpo.strip(), None
+        if cuerpo.lower().startswith("bajada:"):
+            primera, _, cuerpo = cuerpo.partition("\n")
+            bajada = primera.split(":", 1)[1].strip()
+        item = dict(titulo=titulo, bajada=bajada, cuerpo=cuerpo.strip())
+        tk = re.match(r"([A-Z][A-Z.\-]*)\s*·", titulo)
+        if tk:
+            out["fichas"][tk.group(1)] = item
+        else:
+            out["contexto"] = item
+    return out
+
+
 def resumen_web(rows) -> dict:
     done = [r for r in rows if r["real"] is not None]
     n = len(done)
@@ -1013,7 +1035,8 @@ def export_web(rows, data, spy, fridays, val_date, params_info, warnings, site_d
     payload = dict(
         meta=meta, resumen=resumen_web(rows), acciones=acciones, viernes=[_d(f) for f in fridays],
         contenido=dict(danelfin=_leer_md(site_dir / "contenido" / "danelfin.md"),
-                       conclusiones=_leer_md(site_dir / "contenido" / "conclusiones.md")),
+                       conclusiones=_leer_md(site_dir / "contenido" / "conclusiones.md"),
+                       empresas=_leer_empresas(site_dir / "contenido" / "empresas.md")),
     )
     out = site_dir / "data" / "datos.js"
     out.parent.mkdir(parents=True, exist_ok=True)
