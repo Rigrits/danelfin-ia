@@ -266,10 +266,36 @@
   }
 
   /* ---------------------------------------------------------------- técnico al recomendar */
+  // Línea vertical punteada en el día de la recomendación, con su rótulo.
+  var marcaRec = {
+    id: 'marcaRec',
+    afterDatasetsDraw: function (chart, args, o) {
+      if (!o || o.idx == null || o.idx < 0) return;
+      var x = chart.scales.x.getPixelForValue(o.idx), a = chart.chartArea, c = chart.ctx;
+      c.save();
+      c.strokeStyle = o.color; c.lineWidth = 1.5; c.setLineDash([4, 3]);
+      c.beginPath(); c.moveTo(x, a.top); c.lineTo(x, a.bottom); c.stroke();
+      if (o.texto) {
+        c.setLineDash([]);
+        c.font = '700 11px "Atkinson Hyperlegible", system-ui, sans-serif';
+        var w = c.measureText(o.texto).width + 8, izq = x + w + 4 > a.right;
+        c.fillStyle = o.bg; c.globalAlpha = .9;
+        c.fillRect(izq ? x - w - 3 : x + 3, a.top + 2, w, 15);
+        c.globalAlpha = 1; c.fillStyle = o.color; c.textAlign = 'left';
+        c.fillText(o.texto, (izq ? x - w - 3 : x + 3) + 4, a.top + 13);
+      }
+      c.restore();
+    }
+  };
+  // Serie a graficar: lo previo y, si se pide, la continuación hasta el corte; idx = índice de la recomendación.
+  function serieTec(a, conPost) {
+    var p = a.pre || [], q = (conPost && a.post) || [];
+    return { pts: p.concat(q), idx: q.length ? p.length : -1 };
+  }
   // Precio y medias de los ~6 meses previos a la recomendación (solo lo que se veía ese día).
   function tecPrecio(canvas, a, opts) {
-    var t = theme(), p = a.pre, compacto = opts && opts.compacto;
-    if (!p || !p.length) return null;
+    var t = theme(), compacto = opts && opts.compacto, S = serieTec(a, !compacto), p = S.pts;
+    if (!p.length) return null;
     var labels = p.map(function (x) { return x.d; });
     var ds = function (label, key, color, width, dash) {
       return { label: label, data: p.map(function (x) { return x[key]; }), borderColor: color, borderWidth: width,
@@ -279,7 +305,8 @@
     o.interaction = { mode: 'index', intersect: false };
     o.plugins = { legend: { display: false },
       tooltip: { callbacks: { title: function (i) { return Fmt.date(i[0].label); },
-        label: function (it) { return it.dataset.label + ': ' + Fmt.n2(it.parsed.y); } } } };
+        label: function (it) { return it.dataset.label + ': ' + Fmt.n2(it.parsed.y); } } },
+      marcaRec: { idx: S.idx, color: t.ink2, bg: t.surface, texto: 'Recomendación ' + Fmt.dm(a.fechaRec) } };
     o.scales = {
       x: { ticks: { color: t.ink3, maxTicksLimit: 6, callback: function (v) { return Fmt.dm(this.getLabelForValue(v)); } }, grid: { display: false } },
       y: { ticks: { color: t.ink3, callback: function (v) { return Fmt.n2(v); } }, grid: { color: t.line }, border: { display: false } }
@@ -293,19 +320,20 @@
       ds('EMA 20', 'e20', t.real, 1.6),
       ds('EMA 50', 'e50', t.hold, 1.6, [6, 4]),
       ds('EMA 200', 'e200', t.spy, 1.6, [2, 3])
-    ] }, options: o });
+    ] }, options: o, plugins: [marcaRec] });
   }
   // Osciladores: RSI y MFI (0-100) en un gráfico; ADX, +DI y -DI en otro. Sin líneas de umbral.
   function tecOsc(cvA, cvB, a) {
-    var t = theme(), p = a.pre, out = [];
-    if (!p || !p.length) return out;
+    var t = theme(), S = serieTec(a, true), p = S.pts, out = [];
+    if (!p.length) return out;
     var labels = p.map(function (x) { return x.d; });
     var mk = function (canvas, sets, yOpt) {
       var o = base(t);
       o.interaction = { mode: 'index', intersect: false };
       o.plugins = { legend: { display: false },
         tooltip: { callbacks: { title: function (i) { return Fmt.date(i[0].label); },
-          label: function (it) { return it.dataset.label + ': ' + Fmt.n1(it.parsed.y); } } } };
+          label: function (it) { return it.dataset.label + ': ' + Fmt.n1(it.parsed.y); } } },
+        marcaRec: { idx: S.idx, color: t.ink2, bg: t.surface, texto: 'Recomendación ' + Fmt.dm(a.fechaRec) } };
       o.scales = {
         x: { ticks: { color: t.ink3, maxTicksLimit: 6, callback: function (v) { return Fmt.dm(this.getLabelForValue(v)); } }, grid: { display: false } },
         y: Object.assign({ ticks: { color: t.ink3 }, grid: { color: t.line }, border: { display: false } }, yOpt)
@@ -313,7 +341,7 @@
       return new Chart(canvas, { type: 'line', data: { labels: labels, datasets: sets.map(function (s) {
         return { label: s[0], data: p.map(function (x) { return x[s[1]]; }), borderColor: s[2], borderWidth: 1.8,
           borderDash: s[3], pointRadius: 0, pointHoverRadius: 3, tension: .1, fill: false };
-      }) }, options: o });
+      }) }, options: o, plugins: [marcaRec] });
     };
     out.push(mk(cvA, [['RSI', 'rsi', t.real], ['MFI', 'mfi', t.hold, [6, 4]]], { min: 0, max: 100 }));
     out.push(mk(cvB, [['ADX', 'adx', t.ink], ['+DI', 'pdi', t.gain], ['−DI', 'mdi', t.loss, [6, 4]]], { min: 0 }));

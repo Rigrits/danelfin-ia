@@ -254,7 +254,7 @@
       h += '<article class="tecnica" data-id="' + esc(a.id) + '">' +
         '<header><div><span class="tk">' + esc(a.etiqueta) + '</span> <span class="co">' + esc(a.empresa) + '</span></div>' +
         '<span class="muted small">Recomendada el ' + Fmt.date(a.fechaRec) + ' · dato al cierre del ' + Fmt.date(s.fecha) + '</span></header>' +
-        '<div class="tec-chart"><canvas role="img" aria-label="Precio de ' + esc(a.ticker) + ' y medias de 20, 50 y 200 ruedas en los seis meses previos a la recomendación"></canvas></div>' +
+        '<div class="tec-chart"><canvas role="img" aria-label="Precio de ' + esc(a.ticker) + ' y medias de 20, 50 y 200 ruedas antes y después de la recomendación"></canvas></div>' +
         '<div class="tec-vals">' +
           v('Cierre', Fmt.n2(s.cierre)) + v('vs EMA 20', dist(s.cierre, s.ema20)) + v('vs EMA 50', dist(s.cierre, s.ema50)) + v('vs EMA 200', dist(s.cierre, s.ema200)) +
           v('RSI', Fmt.n1(s.rsi)) + v('MFI', Fmt.n1(s.mfi)) + v('ADX', Fmt.n1(s.adx)) + v('+DI / −DI', Fmt.n1(s.pdi) + ' / ' + Fmt.n1(s.mdi)) +
