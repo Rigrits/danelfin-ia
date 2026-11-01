@@ -453,3 +453,10 @@ html.presentando { font-size: clamp(18px, 1.2vw, 26px); }
   html:not(.forzar-mov) .pr-rev { transition: none; translate: none; }
   html:not(.forzar-mov) .pr::before { transition: none; }
 }
+
+/* versión común: sin escenas, sin viaje de cámara ni entradas animadas */
+.pr-modo-clasica .pr-slide, .pr-modo-clasica .pr-clave * { animation: none !important; }
+.pr-modo-clasica .pr::before, .pr-modo-clasica::before { transition: none; }
+.pr-modo-clasica .pr-3d-portada { display: none; }
+.pr-modo-clasica .pr-3d-resultados { height: auto; }
+.pr-modo { min-width: 52px; font-size: .85rem; }

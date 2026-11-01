@@ -11,6 +11,10 @@
   var frases = P.frases || {};
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches && !/[?&]movimiento=1/.test(location.search);   // ?movimiento=1 fuerza las animaciones
   if (/[?&]movimiento=1/.test(location.search)) document.documentElement.classList.add('forzar-mov');
+  // Versión 3D (por defecto) o común: botón 3D/2D, tecla M o ?modo=clasica. Se recuerda en este navegador.
+  var clasica = /[?&]modo=clasica/.test(location.search);
+  if (!clasica && !/[?&]modo=3d/.test(location.search)) { try { clasica = localStorage.getItem('pr-modo') === 'clasica'; } catch (e) {} }
+  function mov() { return !reduce && !clasica; }
   var DEFECTO = [
     { tipo: 'portada', titulo: '¿Acertó Danelfin?' }, { tipo: 'danelfin', titulo: 'Qué promete Danelfin' },
     { tipo: 'metodo', titulo: 'Cómo lo medimos' }, { tipo: 'numeros', titulo: 'Los números' },
@@ -76,7 +80,7 @@
   var con = function (a) { return a.real != null; };
   // Escena 3D con respaldo 2D: si WebGL no está o falla, se ejecuta `respaldo`.
   function escena(cont, tipo, res, respaldo) {
-    if (!window.Escenas3D || !Escenas3D.disponible()) { if (respaldo) respaldo(); return; }
+    if (clasica || !window.Escenas3D || !Escenas3D.disponible()) { if (respaldo) respaldo(); return; }
     Escenas3D.crear(cont, tipo, D.acciones).then(function (h) {
       if (res.liberado) h.destroy(); else res.escenas.push(h);
     }).catch(function () { cont.classList.add('sin-3d'); if (respaldo && !res.liberado) respaldo(); });
@@ -205,7 +209,7 @@
   function contar(el) {
     $$('.cnt', el).forEach(function (n) {
       var v = parseFloat(n.getAttribute('data-v')), f = n.getAttribute('data-f');
-      if (reduce || isNaN(v)) return;
+      if (!mov() || isNaN(v)) return;
       var ini = performance.now(), dur = 1100, retraso = 250;
       n.textContent = fmtC(0, f);
       (function paso(now) {
@@ -241,11 +245,12 @@
     var res = { charts: [], escenas: [], liberado: false };
     stage.appendChild(el);
     var pasos = 0;
-    $$('.pr-rev', el).forEach(function (e) { pasos = Math.max(pasos, +e.getAttribute('data-paso') + 1); });
+    if (!clasica) $$('.pr-rev', el).forEach(function (e) { pasos = Math.max(pasos, +e.getAttribute('data-paso') + 1); });
+    else $$('.pr-rev', el).forEach(function (e) { e.classList.add('vis'); });
     actual = { el: el, res: res, pasos: pasos, paso: 0 };
-    mostrarPasos(dir < 0 ? pasos : 0);                          // al volver hacia atrás se ve completa
+    if (!clasica) mostrarPasos(dir < 0 ? pasos : 0); else { actual.paso = 0; progreso(); }                          // al volver hacia atrás se ve completa
     if (r.after) r.after(el, res);
-    if (prev && !reduce) {
+    if (prev && mov()) {
       el.classList.add(dir > 0 ? 'entra-adelante' : 'entra-atras');
       prev.el.classList.add(dir > 0 ? 'sale-adelante' : 'sale-atras');
       var x = { el: prev.el, res: prev.res };
@@ -253,7 +258,7 @@
       saliendo.push(x);
     } else if (prev) {
       liberar(prev.res); if (prev.el.parentNode) prev.el.parentNode.removeChild(prev.el);
-    } else if (!reduce) {
+    } else if (mov()) {
       el.classList.add('entra-adelante');
     }
     root.style.setProperty('--viaje', idx);
@@ -297,8 +302,9 @@
       temaPrevio = document.documentElement.getAttribute('data-theme');
       document.documentElement.setAttribute('data-theme', 'dark');           // identidad oscura propia del modo
       document.documentElement.classList.add('presentando');
-      Charts.lento = true;                                                    // gráficos que se dibujan al entrar
     }
+    Charts.lento = !clasica;                                                  // gráficos que se dibujan al entrar
+    marcarModo();
     if (!t0) t0 = Date.now();
     if (!timer) timer = setInterval(reloj, 1000);
     reloj();
@@ -322,6 +328,21 @@
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
   }
+  function marcarModo() {
+    root.classList.toggle('pr-modo-clasica', clasica);
+    var b = $('.pr-modo');
+    if (b) { b.textContent = clasica ? '2D' : '3D'; b.setAttribute('aria-pressed', String(!clasica));
+      b.title = clasica ? 'Versión común (M): pasar a 3D' : 'Versión 3D (M): pasar a la común'; }
+  }
+  function cambiarModo() {
+    clasica = !clasica;
+    try { localStorage.setItem('pr-modo', clasica ? 'clasica' : '3d'); } catch (e) {}
+    Charts.lento = !clasica;
+    marcarModo();
+    terminarSalidas();                                        // se vuelve a dibujar la diapositiva actual en el modo nuevo
+    if (actual) { liberar(actual.res); if (actual.el.parentNode) actual.el.parentNode.removeChild(actual.el); actual = null; }
+    render(idx, -1);
+  }
   function salir() { if (root.open) root.close(); terminar(); }
   root.addEventListener('cancel', function () { terminar(); });
   root.addEventListener('close', function () { if (!root.open) terminar(); });
@@ -334,6 +355,7 @@
     else if (k === 'End') { e.preventDefault(); render(slides.length - 1, -1); }
     else if (k === 'Escape') { e.preventDefault(); salir(); }
     else if (k === 'n' || k === 'N') { notes.hidden = !notes.hidden; }
+    else if (k === 'm' || k === 'M') { cambiarModo(); }
     else if (k === 'f' || k === 'F') {
       if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
       else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
@@ -346,6 +368,7 @@
     else if (e.target.closest('.pr-next')) siguiente();
     else if (e.target.closest('.pr-close')) salir();
     else if (e.target.closest('.pr-toggle-notes')) notes.hidden = !notes.hidden;
+    else if (e.target.closest('.pr-modo')) cambiarModo();
     else if (e.target.closest('.pr-n-reset')) { t0 = Date.now(); reloj(); }
   });
   if (A.detalle) A.detalle.addEventListener('close', function () { if (root.open) root.focus(); });
