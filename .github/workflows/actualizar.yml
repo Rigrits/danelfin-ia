@@ -6,9 +6,7 @@ name: Actualizar seguimiento y publicar web
 # La segunda corrida, a las 12:00 UTC del día siguiente (antes de la apertura), completa los
 # cierres que alguna fuente no había publicado todavía en la corrida de la noche.
 on:
-  schedule:
-    - cron: "30 21 * * 1-5"
-    - cron: "0 12 * * 2-6"
+  # Sin corridas programadas: el seguimiento cerró el 23/10/2026 (última fecha de control de precios).
   workflow_dispatch:            # botón "Run workflow" en la pestaña Actions
   push:
     branches: [main]

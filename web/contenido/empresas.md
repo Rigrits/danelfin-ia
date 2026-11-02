@@ -4,7 +4,7 @@
   (resumen corto que se muestra arriba de cada ficha). El resto es la ficha completa en Markdown.
   La sección "## Contexto general" (sin ticker) se muestra arriba de las fichas.
   Fuentes buscadas el 01/11/2026; cifras de noticias aproximadas y a verificar por el equipo.
-  Rendimientos al 30/10/2026 (último cierre del seguimiento al escribir esto): se actualizan solos en la web, el texto no.
+  Rendimientos al 23/10/2026, última fecha de control de precios del seguimiento.
 -->
 
 ## Contexto general

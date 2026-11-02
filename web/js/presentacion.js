@@ -94,7 +94,7 @@
         '<div class="pr-cover"><p class="eyebrow">Seguimiento independiente · Inteligencia artificial aplicada a inversiones</p>' +
         '<h1>' + esc(s.titulo || '¿Acertó Danelfin?') + '</h1>' + (s.idea ? '<p class="pr-idea">' + esc(s.idea) + '</p>' : '') +
         '<p class="pr-meta">' + D.acciones.length + ' recomendaciones · del ' + Fmt.date(fechas[0]) + ' al ' + Fmt.date(D.meta.corte) +
-        ' · datos al último cierre</p>' +
+        ' · último control de precios</p>' +
         (D.meta.equipo && D.meta.equipo.length ? '<p class="pr-meta small">Elaborado por: ' + esc(D.meta.equipo.join(', ')) + '</p>' : '') + '</div>',
         after: function (el, res) { escena($('.pr-3d', el), 'portada', res); } };
     },

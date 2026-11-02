@@ -397,7 +397,7 @@
     if (m.equipoNombre) $('#equipo-nombre').textContent = m.equipoNombre + '. ';
     $('#integrantes').textContent = m.equipo.join(', ') + '.';
     var g = new Date(m.generado);
-    $('#pie-datos').textContent = 'Datos al último cierre del ' + Fmt.date(m.corte) + ' · generado el ' +
+    $('#pie-datos').textContent = 'Datos al cierre del ' + Fmt.date(m.corte) + ' · generado el ' +
       g.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' }) + '.';
   }
 

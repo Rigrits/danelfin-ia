@@ -60,6 +60,7 @@ CACHE_DIR = BASE / "cache"
 
 INTEGRANTES = ["Vivas", "Devita", "Rodriguez", "Toffoletti", "Sanguinetti", "Guevara"]   # se muestran en orden alfabético
 EQUIPO_NOMBRE = ""                 # nombre del equipo o firma; vacío = no se muestra
+FECHA_FIN = "2026-10-23"            # última fecha de control de precios del trabajo: no se toman datos posteriores
 CAPITAL_POR_IDEA = 1000.0          # USD invertidos en cada recomendación: base de la ganancia/pérdida en valores absolutos
 
 BENCHMARK = "SPY"                 # S&P 500 (ETF)
@@ -1144,7 +1145,7 @@ def update_cierres(data, tickers, last_session: pd.Timestamp, path: Path) -> boo
 # ==================================================================== MAIN
 def main() -> None:
     ap = argparse.ArgumentParser(description="Seguimiento Danelfin AI -> Excel + datos de la web")
-    ap.add_argument("--end", help="fecha de corte YYYY-MM-DD (por defecto hoy)")
+    ap.add_argument("--end", help="fecha de corte YYYY-MM-DD (por defecto hoy, nunca después de FECHA_FIN)")
     ap.add_argument("--corte", choices=["ultima-rueda", "ultimo-viernes"], default="ultima-rueda",
                     help="a qué fecha se valúan las posiciones (por defecto: última rueda cerrada)")
     ap.add_argument("--recs", default=str(RECS_CSV), help="CSV de recomendaciones")
@@ -1164,7 +1165,7 @@ def main() -> None:
 
     env = load_env()
     key = os.environ.get("MASSIVE_API_KEY") or env.get("MASSIVE_API_KEY")
-    end = pd.Timestamp(args.end) if args.end else today_et()
+    end = min(pd.Timestamp(args.end) if args.end else today_et(), pd.Timestamp(FECHA_FIN))
     warnings: list[str] = []
 
     log("1/5 Leyendo recomendaciones ...")
@@ -1177,6 +1178,7 @@ def main() -> None:
     data = {}
     for t in tickers:
         df, src = get_ohlcv(t, start, end, args.refresh, key, warnings)
+        df = df.loc[:end]                                 # nada posterior a la fecha de corte
         data[t] = dict(df=df, src=src, ind=indicators(df))
         log(f"    {t:5s} {len(df):4d} ruedas hasta {df.index.max():%d/%m/%Y}  [{src}]")
         if args.verify:
