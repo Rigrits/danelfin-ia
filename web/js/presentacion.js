@@ -61,7 +61,7 @@
   }
   function tarjetas(lista, textos) {
     if (!lista.length) return '<p class="pr-vacio">No hay recomendaciones en este grupo.</p>';
-    return '<div class="pr-cards n' + Math.min(lista.length, 4) + '">' + lista.map(function (a, i) {
+    return '<div class="pr-cards n' + Math.min(lista.length, 5) + '">' + lista.map(function (a, i) {
       return '<button type="button" class="pr-card pr-rev" data-paso="' + i + '" data-id="' + esc(a.id) + '" aria-label="' + esc(a.etiqueta) + ': ver el detalle diario">' +
         '<span class="top"><span class="tk">' + esc(a.etiqueta) + '</span><span class="co">' + esc(a.empresa) + '</span></span>' +
         A.badge(a) +
@@ -157,7 +157,10 @@
       }).join('') + '</ul>' };
     },
     empresas: function (s) {
-      var lista = D.acciones.filter(function (a) { return !s.mes || a.fechaRec.slice(0, 7) === s.mes; });
+      // por tema (campo tickers, en ese orden) o por mes de recomendación (campo mes)
+      var tk = s.tickers ? String(s.tickers).split(',').map(function (x) { return x.trim().toUpperCase(); }) : null;
+      var lista = tk ? tk.map(function (t) { return D.acciones.filter(function (a) { return a.ticker === t; })[0]; }).filter(Boolean)
+        : D.acciones.filter(function (a) { return !s.mes || a.fechaRec.slice(0, 7) === s.mes; });
       return { html: head(s) + tarjetas(lista), after: dibujarMinis };
     },
     casos: function (s) {

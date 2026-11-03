@@ -64,10 +64,10 @@ idea: El promedio de las posiciones, viernes a viernes, contra el S&P 500.
 
 ## 6 · El contexto
 tipo: contexto
-bloque: Empresas · julio
+bloque: Empresas · IA y energía
 tiempo: 2:30
 titulo: Un período difícil
-idea: Cuatro fuerzas que movieron al mercado entre julio y octubre.
+idea: Cuatro fuerzas que movieron al mercado entre julio y octubre, y que explican cómo se agrupan las empresas.
 punto: Guerra en Medio Oriente: el petróleo subió con fuerza y encareció el combustible.
 punto: Tasas: la Reserva Federal dejó de bajarlas y el mercado empezó a esperar subas.
 punto: Oro: cayó desde su récord de enero, arrastrando a las mineras.
@@ -76,35 +76,38 @@ punto: Inteligencia artificial: varias olas de dudas sobre la inversión golpear
 - Este contexto explica buena parte de lo que se ve en las empresas.
 - El 22 de octubre fue un día de caída general que sacó a varias posiciones a la vez.
 
-## 7 · Julio
+## 7 · IA y energía
 tipo: empresas
-mes: 2026-07
-titulo: Las recomendaciones de julio
-idea: Infraestructura, energía y aleaciones para la aviación.
+tickers: VRT, GEV, MTZ
+titulo: El boom de la IA y la energía
+idea: Centros de datos, generación eléctrica e infraestructura: tres apuestas al mismo tema.
 
-- Leer la frase de cada tarjeta; abrir el detalle de una (MTZ o CRS) para mostrar la ✕ del stop.
-- Patrón: buenos resultados que igual cayeron porque venían de subir mucho.
+- Las tres dependen de la inversión en inteligencia artificial y en la red eléctrica que la alimenta.
+- Leer la frase de cada tarjeta; abrir el detalle de MTZ para mostrar la ✕ del stop.
+- Dato para remarcar en cada una: la diferencia entre el resultado real y el hold.
 
-## 8 · Agosto
+## 8 · Aeroespacial y defensa
 tipo: empresas
-mes: 2026-08
-bloque: Empresas · agosto
+tickers: RTX, ATI, CRS, PH, AER
+bloque: Empresas · aeroespacial
 tiempo: 2:30
-titulo: Las recomendaciones de agosto
-idea: Consumo, energía eléctrica, defensa y materiales aeroespaciales.
+titulo: Aeroespacial y defensa
+idea: Cinco de las doce ideas apuntaron a la misma cadena: aviones, motores y sus materiales.
 
-- Abrir el detalle de una (GEV o ATI).
-- GEV y ATI se movieron con el sentimiento de su sector más que con sus propios resultados.
+- Fabricantes de motores y sistemas (RTX, PH), de aleaciones (ATI, CRS) y de alquiler de aviones (AER).
+- Abrir el detalle de una (CRS o ATI).
+- AER es una de las dos que siguen abiertas.
 
-## 9 · Septiembre
+## 9 · Fuera del eje
 tipo: empresas
-mes: 2026-09
-bloque: Empresas · septiembre
+tickers: FTI, AU, CASY, AAPL
+bloque: Empresas · otros sectores
 tiempo: 2:30
-titulo: Las recomendaciones de septiembre
-idea: Aviación, oro, tecnología e industria.
+titulo: Fuera del eje
+idea: Petróleo, oro, consumo y tecnología: las ideas que no siguieron un tema común.
 
-- Acá están las que siguen abiertas.
+- FTI es el único caso en que el stop empeoró el resultado: vendió y la acción se recuperó.
+- AU siguió al oro; AAPL es la otra posición abierta.
 - Pasar a la diapositiva siguiente para los tres casos que resumen el seguimiento.
 
 ## 10 · Tres casos
