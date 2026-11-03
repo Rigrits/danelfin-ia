@@ -17,14 +17,32 @@ Danelfin es una plataforma de análisis de acciones basada en inteligencia artif
 
 ## Cómo se arma el AI Score
 
-Según la descripción que publica la propia empresa [6][7]:
+Según la documentación de la propia empresa: su centro de ayuda [7] y el sitio de auditoría que publica, *Danelfin AI Audit* [6].
 
-- **Datos:** cada día calcula unas 10.000 variables (*features*) por acción, a partir de más de 600 indicadores técnicos, 150 fundamentales y 150 de sentimiento.
-- **Señales:** el modelo busca las que más *alpha* (rendimiento por encima del mercado) generaron en el pasado reciente: las últimas 252 ruedas para acciones de EE. UU. y 500 para Europa. Danelfin las llama *alpha signals*.
-- **Modelo:** esas señales alimentan un conjunto de árboles de decisión. Una página habla de 500 árboles y otra de "cientos". La probabilidad de la acción es el promedio de la de todos los árboles y, en EE. UU., se ajusta por la volatilidad de la acción.
-- **Resultado:** esa probabilidad de superar al índice de referencia en 3 meses se traduce al AI Score de 1 a 10. La plataforma también muestra cuatro subpuntajes de 1 a 10 (técnico, fundamental, sentimiento y riesgo bajo) y qué señales suman o restan en cada caso.
+1. **Datos.** Cada rueda calcula unos 900 indicadores por acción: más de 600 técnicos (RSI, MACD, MFI, momentum, volatilidad, distancia a soportes, máximo de 52 semanas, entre otros), unos 150 fundamentales (P/E, P/FCF, EBITDA, margen bruto, ROA, F-Score de Piotroski, crecimiento de ventas y de ganancias) y unos 150 de sentimiento (precio objetivo de analistas, estimaciones de ganancias, *short float*, compras de insiders y de fondos). Con ellos arma unas 10.000 variables (*features*). Todos los datos son públicos; además genera patrones propios de precio a 30, 60 y 90 ruedas [7].
+2. **Señales (*alpha signals*).** Con las últimas 252 ruedas en EE. UU. (504 en Europa), el modelo identifica qué variables anticiparon mejor el *alpha*, positivo o negativo, a 3 meses (unas 60 ruedas). Se reentrena en ventana móvil [6][7].
+3. **Modelo.** Combina esas señales en unos 500 árboles de decisión con *gradient boosting* (LightGBM). Cada árbol corrige el error del anterior y la probabilidad final es la suma de esas correcciones [6][7]. Algunas guías antiguas del centro de ayuda la describen como "el promedio de los árboles", pero eso no corresponde a LightGBM.
+4. **Objetivo.** El modelo estima la probabilidad de que la acción supere al S&P 500 (el ETF SPY, con dividendos) en los 3 meses siguientes. Para acciones europeas la referencia es el STOXX Europe 600 [6][7].
+5. **Puntaje.** El AI Score de 1 a 10 sale de la *ventaja de probabilidad*: cuánto supera la probabilidad de la acción al promedio de todas las acciones de EE. UU. Ese promedio suele estar por debajo de 50%, porque la mayoría de las más de 5.000 acciones no le gana al S&P 500. En un ejemplo de la propia Danelfin, una acción con 48,6% contra un promedio de 34,7% (+13,9 puntos) obtuvo un 10 [7]. La equivalencia es: 10 compra fuerte, 7 a 9 compra, 4 a 6 mantener, 2 y 3 venta, 1 venta fuerte. Desde el 30/09/2026 la conversión aplica además una penalización por volatilidad [6]. Las recomendaciones de este informe son anteriores a ese cambio.
+6. **Subpuntajes.** El técnico, el fundamental y el de sentimiento se calculan igual que el AI Score, pero solo con las señales de su tipo. El AI Score no es su promedio y puede diferir mucho de ellos. El subpuntaje de **riesgo bajo** mide la semidesviación (las caídas de precio) de las últimas 500 ruedas: cuanto más alto, menos riesgo bajista [6][7].
+7. **Actualización.** Se recalcula cada día hábil con el cierre del día anterior [7].
 
-Es la metodología declarada por Danelfin. No hay una auditoría independiente del modelo y la empresa no detalla cómo calcula el subpuntaje de riesgo bajo.
+**Cómo elige la *idea de la semana*.** Una *Trade Idea* es una acción con señal de compra actual cuyas señales de compra pasadas tuvieron una tasa de acierto de al menos 60% (los boletines analizados piden 70%). Danelfin aclara que ese porcentaje describe señales pasadas y no es una probabilidad para la próxima [7].
+
+## Qué muestra su propia auditoría
+
+El sitio *Danelfin AI Audit* [6] (datos al 24/09/2026) separa dos períodos que conviene no mezclar:
+
+- **Antes del 7/7/2025: simulación.** Los puntajes de 2017 a julio de 2025 fueron **recalculados en 2025 por el modelo actual**, *walk-forward*: cada fecha se puntúa con un modelo entrenado solo con datos previos a ella. El propio sitio aclara que es un *backtest* simulado y que sus controles no pueden detectar sesgo de anticipación (*look-ahead*) dentro de esos puntajes recalculados. También reconoce un sesgo de supervivencia: la historia no incluye empresas que dejaron de cotizar, como Twitter, Silicon Valley Bank o Celgene.
+- **Desde el 7/7/2025: en vivo.** Son los únicos puntajes publicados en el momento. A 3 meses, el *alpha* promedio contra el S&P 500 fue:
+
+| AI Score | En vivo (7/7/2025 – 9/2026) | Simulado (2017 – 7/2025) |
+|---|---|---|
+| 8 a 10 | −0,50% | +2,22% |
+| 10 | −6,35% (positivo en 33% de las fechas) | +3,18% |
+| 8 a 10 menos 1 a 3 | +12,95% | +7,05% |
+
+En vivo, los puntajes altos le ganaron poco o nada al S&P 500 a 3 meses, aunque las acciones con puntaje alto sí superaron con holgura a las de puntaje bajo. El sitio advierte que el período en vivo es corto y que hay pocas observaciones independientes (su "N efectivo" a 3 meses es 4), así que no permite conclusiones firmes. Dentro de la simulación, el *alpha* a 3 meses de las acciones con puntaje 10 baja con el tiempo: +5,4% en 2017-2019, +0,3% en 2020-2022 y −0,5% de 2023 a julio de 2025.
 
 ## Historia
 
@@ -46,5 +64,5 @@ Danelfin comunica que las acciones con AI Score 10 superaron al S&P 500 en prome
 3. Descripciones de la plataforma en directorios y reseñas (por ejemplo, [CB Insights](https://www.cbinsights.com/company/danelfin)), usadas solo para confirmar el concepto del AI Score de 1 a 10.
 4. Reseñas externas, por ejemplo [Pineify, «Danelfin Review»](https://pineify.app/danelfin/danelfin-review); no verificado contra los documentos de Danelfin.
 5. Boletín *Trade Idea of the Week* de Danelfin AI (boletines de julio a septiembre de 2026).
-6. Danelfin, [«How it Works»](https://danelfin.com/how-it-works) e [infografía](https://danelfin.com/how-it-works/infographic), consultadas el 02/11/2026.
-7. Centro de ayuda de Danelfin, [«What is the AI Score? How it rates stocks and ETFs?»](https://support.danelfin.com/hc/en-us/articles/4404382038545-What-is-the-AI-Score-How-it-rates-stocks-and-ETFs), consultado el 02/11/2026.
+6. Danelfin, [*Danelfin AI Audit*](https://audit.danelfin.com/): [«How It Works»](https://audit.danelfin.com/how-it-works.html), [preguntas frecuentes](https://audit.danelfin.com/faq.html) y pestañas *Live vs. Sub-Periods* y *Bias Audit*, datos al 24/09/2026, consultado el 02/11/2026.
+7. Centro de ayuda de Danelfin ([help.danelfin.com](https://help.danelfin.com/en/categories/ai-score)): guías sobre el AI Score, los subpuntajes, las *alpha signals*, el riesgo bajo, la probabilidad promedio y las *Trade Ideas*, consultado el 02/11/2026.

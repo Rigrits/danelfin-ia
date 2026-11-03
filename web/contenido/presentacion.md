@@ -29,10 +29,11 @@ titulo: Qué promete Danelfin
 idea: Un puntaje de 1 a 10 que estima la probabilidad de que una acción supere al mercado en los siguientes tres meses.
 
 - Plataforma fundada en Barcelona en 2016. Cada semana su boletín elige una acción y sugiere entrada, stop loss y take profit.
-- Cómo arma el puntaje: unas 10.000 variables diarias por acción, a partir de más de 600 indicadores técnicos, 150 fundamentales y 150 de sentimiento.
-- El modelo busca las señales que más rindieron en el último año de ruedas y las pasa por cientos de árboles de decisión; promedia la probabilidad de todos, la ajusta por volatilidad y la lleva a la escala 1 a 10.
-- Da además subpuntajes de 1 a 10: técnico, fundamental, sentimiento y riesgo bajo.
-- Todo esto según la propia Danelfin; no hay auditoría independiente del modelo ni de sus resultados históricos.
+- Cómo arma el puntaje: ~900 indicadores diarios por acción (técnicos, fundamentales, de sentimiento), convertidos en ~10.000 variables.
+- Busca qué variables anticiparon superar al S&P 500 a 3 meses en el último año de ruedas y las combina en ~500 árboles de decisión en cadena (LightGBM).
+- El puntaje de 1 a 10 refleja cuánto supera la probabilidad de la acción al promedio del mercado. Es relativo: un 10 puede tener menos de 50% de probabilidad.
+- Su propia auditoría separa una simulación (2017 a julio de 2025, recalculada en 2025) de un período en vivo (desde el 7/7/2025). En vivo, a 3 meses, los puntajes 8 a 10 dieron −0,5% contra el S&P 500, y los 10, −6,4%. En la simulación: +2,2% y +3,2%. El período en vivo todavía es corto.
+- La "idea de la semana" exige que las señales de compra pasadas de esa acción hayan acertado 70% o más; Danelfin aclara que no es una probabilidad para la próxima.
 - Las cifras de la parte de arriba son las que Danelfin cita en sus propios boletines.
 
 ## 3 · Los números

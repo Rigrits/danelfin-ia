@@ -485,3 +485,7 @@ html.presentando { font-size: clamp(18px, 1.2vw, 26px); }
 .pr-fl .d { font-size: .82rem; color: var(--ink-2); line-height: 1.4; }
 .pr-fuente { font-size: .75rem; color: var(--ink-3); margin: .7rem 0 0; }
 @media (max-width: 1000px) { .pr-flujo { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pr-fl::after { display: none; } }
+.pr-danelfin .pr-head { margin-bottom: .7rem; }
+.pr-danelfin .pr-idea { font-size: clamp(1rem, 1.7vw, 1.4rem); }
+.pr-danelfin .pr-inner { padding-top: clamp(1rem, 3vh, 2.4rem); padding-bottom: 3.6rem; }
+.pr-danelfin .pr-tile .s { font-size: .78rem; }

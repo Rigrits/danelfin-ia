@@ -109,11 +109,11 @@
         tile('Probabilidad prometida', cnt(R.probProm, 'pctn'), 'de superar al mercado, promedio') + '</div>' +
         // Cómo se arma el AI Score, según la propia Danelfin (danelfin.com/how-it-works)
         '<div class="pr-flujo">' +
-          paso3(0, 'Datos', '<strong>~10.000</strong> variables diarias por acción', 'más de 600 indicadores técnicos, 150 fundamentales y 150 de sentimiento') +
-          paso3(1, 'Señales', 'Las que más <em>alpha</em> dieron', 'aprende de las últimas 252 ruedas en EE. UU.') +
-          paso3(2, 'Modelo', 'Cientos de árboles de decisión', 'promedia la probabilidad de todos y la ajusta por volatilidad') +
-          paso3(3, 'Resultado', 'AI Score <strong>1 a 10</strong>', 'probabilidad de superar al mercado a 3 meses; subpuntajes técnico, fundamental, sentimiento y riesgo bajo') +
-        '</div><p class="pr-fuente">Fuente: Danelfin, «How it works» y centro de ayuda. Metodología declarada por la empresa, sin auditoría independiente.</p>' };
+          paso3(0, 'Datos', '<strong>~900</strong> indicadores por acción, cada día', 'más de 600 técnicos, 150 fundamentales y 150 de sentimiento, convertidos en ~10.000 variables') +
+          paso3(1, 'Señales', 'Las que más <em>alpha</em> dieron', 'busca qué variables anticiparon superar al S&amp;P 500 a 3 meses, en las últimas 252 ruedas') +
+          paso3(2, 'Modelo', '~500 árboles en cadena', 'LightGBM: cada árbol corrige el error del anterior; la suma da la probabilidad de superar al S&amp;P 500') +
+          paso3(3, 'Resultado', 'AI Score <strong>1 a 10</strong>', 'según cuánto supera esa probabilidad al promedio del mercado; 7 a 10 = compra') +
+        '</div><p class="pr-fuente">Fuente: Danelfin (audit.danelfin.com y centro de ayuda). Metodología declarada por la empresa; su historial anterior al 7/7/2025 es una simulación recalculada.</p>' };
     },
     metodo: function (s) {
       var paso = function (n, t, d) { return '<div class="pr-step pr-rev" data-paso="' + (n - 1) + '"><span class="n">' + n + '</span><h3>' + t + '</h3><p>' + d + '</p></div>'; };
