@@ -14,7 +14,7 @@
   document.documentElement.setAttribute('data-theme', t);
 })();
 </script>
-<link rel="stylesheet" href="css/styles.css?v=9352b9ea">
+<link rel="stylesheet" href="css/styles.css?v=4178cd04">
 </head>
 <body>
 <!--
@@ -242,13 +242,22 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </div>
   <div class="dlg-body" id="det-cuerpo"></div>
 </dialog>
+<dialog id="tecnico-dlg" class="dlg-tec" aria-labelledby="tec-titulo">
+  <div class="dlg-head">
+    <div><h3 id="tec-titulo"></h3><p class="muted small" id="tec-sub" style="margin:.2rem 0 0"></p></div>
+    <button class="btn icon-btn" type="button" id="tec-cerrar" aria-label="Cerrar análisis técnico">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="dlg-body" id="tec-cuerpo"></div>
+</dialog>
 
 <script src="vendor/chart.umd.min.js?v=b933a2b2"></script>
 <script src="vendor/marked.min.js?v=16009c88"></script>
 <script src="data/datos.js"></script>
-<script src="js/charts.js?v=6f103bfc"></script>
-<script src="js/app.js?v=47e6c236"></script>
+<script src="js/charts.js?v=7a1ca92a"></script>
+<script src="js/app.js?v=01352b67"></script>
 <script src="js/escenas3d.js?v=f57df304"></script>
-<script src="js/presentacion.js?v=9cb83a12"></script>
+<script src="js/presentacion.js?v=e9a633ee"></script>
 </body>
 </html>

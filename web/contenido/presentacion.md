@@ -21,27 +21,21 @@ titulo: ¿Acertó Danelfin?
 idea: Seguimos en tiempo real las recomendaciones de compra de una plataforma de inteligencia artificial, con sus propias reglas.
 
 - Plantear la pregunta: si una IA que promete superar al mercado acertó en sus ideas de compra.
-- Anticipar el recorrido: qué es Danelfin, cómo medimos, resultados, empresas, foto técnica y cierre.
+- Anticipar el recorrido: qué es Danelfin y cómo arma su puntaje, resultados, empresas, foto técnica y cierre.
 
 ## 2 · Qué promete Danelfin
 tipo: danelfin
 titulo: Qué promete Danelfin
 idea: Un puntaje de 1 a 10 que estima la probabilidad de que una acción supere al mercado en los siguientes tres meses.
 
-- Plataforma fundada en Barcelona en 2016; procesa miles de datos fundamentales, técnicos y de sentimiento por acción.
-- Cada semana su boletín elige una acción con buen historial de acierto y sugiere entrada, stop loss y take profit.
-- Las cifras de la pantalla son las que Danelfin cita en sus propios boletines.
+- Plataforma fundada en Barcelona en 2016. Cada semana su boletín elige una acción y sugiere entrada, stop loss y take profit.
+- Cómo arma el puntaje: unas 10.000 variables diarias por acción, a partir de más de 600 indicadores técnicos, 150 fundamentales y 150 de sentimiento.
+- El modelo busca las señales que más rindieron en el último año de ruedas y las pasa por cientos de árboles de decisión; promedia la probabilidad de todos, la ajusta por volatilidad y la lleva a la escala 1 a 10.
+- Da además subpuntajes de 1 a 10: técnico, fundamental, sentimiento y riesgo bajo.
+- Todo esto según la propia Danelfin; no hay auditoría independiente del modelo ni de sus resultados históricos.
+- Las cifras de la parte de arriba son las que Danelfin cita en sus propios boletines.
 
-## 3 · Cómo lo medimos
-tipo: metodo
-titulo: Cómo lo medimos
-idea: Respetamos la entrada, el stop loss y el take profit que publica cada boletín.
-
-- Si en algún momento del día el precio toca el stop, la posición se considera vendida, aunque al cierre recupere.
-- Si abre más allá del nivel, se vende a la apertura.
-- Real: con las reglas. Hold: sin vender nunca. Además, comparación con el S&P 500 en las mismas fechas.
-
-## 4 · Los números
+## 3 · Los números
 tipo: numeros
 bloque: Resultados
 tiempo: 2:00
@@ -51,7 +45,7 @@ idea: Siguiendo sus reglas, la mayoría de las recomendaciones terminó en pérd
 - Leer las cuatro cifras de izquierda a derecha.
 - Remarcar la diferencia entre el resultado real y el hold: es lo que hizo el stop.
 
-## 5 · En dólares
+## 4 · En dólares
 tipo: dolares
 titulo: En dólares
 idea: El mismo capital en cada recomendación, comparado con haberlo puesto en el S&P 500.
@@ -59,7 +53,7 @@ idea: El mismo capital en cada recomendación, comparado con haberlo puesto en e
 - Supuesto: igual monto en cada idea, al precio de entrada, sin comisiones.
 - Barras azules (real) contra ámbar (hold): la distancia entre ambas es el efecto del stop.
 
-## 6 · Semana a semana
+## 5 · Semana a semana
 tipo: semanal
 titulo: Semana a semana
 idea: El promedio de las posiciones, viernes a viernes, contra el S&P 500.
@@ -67,7 +61,7 @@ idea: El promedio de las posiciones, viernes a viernes, contra el S&P 500.
 - La composición cambia: cada semana se suma la recomendación nueva.
 - Señalar dónde se separa del S&P 500.
 
-## 7 · El contexto
+## 6 · El contexto
 tipo: contexto
 bloque: Empresas · julio
 tiempo: 2:30
@@ -81,7 +75,7 @@ punto: Inteligencia artificial: varias olas de dudas sobre la inversión golpear
 - Este contexto explica buena parte de lo que se ve en las empresas.
 - El 22 de octubre fue un día de caída general que sacó a varias posiciones a la vez.
 
-## 8 · Julio
+## 7 · Julio
 tipo: empresas
 mes: 2026-07
 titulo: Las recomendaciones de julio
@@ -90,7 +84,7 @@ idea: Infraestructura, energía y aleaciones para la aviación.
 - Leer la frase de cada tarjeta; abrir el detalle de una (MTZ o CRS) para mostrar la ✕ del stop.
 - Patrón: buenos resultados que igual cayeron porque venían de subir mucho.
 
-## 9 · Agosto
+## 8 · Agosto
 tipo: empresas
 mes: 2026-08
 bloque: Empresas · agosto
@@ -101,7 +95,7 @@ idea: Consumo, energía eléctrica, defensa y materiales aeroespaciales.
 - Abrir el detalle de una (GEV o ATI).
 - GEV y ATI se movieron con el sentimiento de su sector más que con sus propios resultados.
 
-## 10 · Septiembre
+## 9 · Septiembre
 tipo: empresas
 mes: 2026-09
 bloque: Empresas · septiembre
@@ -112,7 +106,7 @@ idea: Aviación, oro, tecnología e industria.
 - Acá están las que siguen abiertas.
 - Pasar a la diapositiva siguiente para los tres casos que resumen el seguimiento.
 
-## 11 · Tres casos
+## 10 · Tres casos
 tipo: casos
 titulo: Tres casos que lo resumen
 idea: La nota más alta, la que funcionó y la única en la que el stop jugó en contra.
@@ -122,7 +116,7 @@ caso: FTI | El stop la sacó en una caída general; después quedó cerca del ni
 
 - Abrir el detalle de AU y de AER si hay tiempo.
 
-## 12 · Qué hizo el stop
+## 11 · Qué hizo el stop
 tipo: stop
 bloque: Foto técnica y cierre
 tiempo: 3:00
@@ -131,7 +125,7 @@ idea: Diferencia entre el resultado con reglas y sin reglas, acción por acción
 
 - Verde: el stop evitó una pérdida mayor. Rojo: el stop perjudicó.
 
-## 13 · La foto técnica
+## 12 · La foto técnica
 tipo: tecnico
 titulo: Cómo estaba cada acción al ser recomendada
 idea: Precio y medias de 20, 50 y 200 ruedas de los seis meses previos, con los valores del día anterior a la idea.
@@ -139,7 +133,7 @@ idea: Precio y medias de 20, 50 y 200 ruedas de los seis meses previos, con los 
 - Mostrar los datos sin imponer una lectura; señalar dos o tres que contrasten entre sí.
 - El análisis técnico no se reduce a una regla: los datos están para que cada uno los mire.
 
-## 14 · Cierre
+## 13 · Cierre
 tipo: cierre
 titulo: Conclusiones
 idea: Qué nos deja el seguimiento.

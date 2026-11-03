@@ -348,6 +348,30 @@
     out.push(mk(cvB, [['ADX', 'adx', t.ink], ['+DI', 'pdi', t.gain], ['−DI', 'mdi', t.loss, [6, 4]]], { min: 0 }));
     return out;
   }
+  // MACD (12, 26, 9): línea y señal, con el histograma en barras verdes/rojas.
+  function tecMacd(canvas, a) {
+    var t = theme(), S = serieTec(a, true), p = S.pts;
+    if (!p.length) return null;
+    var o = base(t);
+    o.interaction = { mode: 'index', intersect: false };
+    o.plugins = { legend: { display: false },
+      tooltip: { callbacks: { title: function (i) { return Fmt.date(i[0].label); },
+        label: function (it) { return it.dataset.label + ': ' + Fmt.n2(it.parsed.y); } } },
+      marcaRec: { idx: S.idx, color: t.ink2, bg: t.surface, texto: 'Recomendación ' + Fmt.dm(a.fechaRec) } };
+    o.scales = {
+      x: { ticks: { color: t.ink3, maxTicksLimit: 6, callback: function (v) { return Fmt.dm(this.getLabelForValue(v)); } }, grid: { display: false } },
+      y: { ticks: { color: t.ink3 }, grid: { color: t.line }, border: { display: false } }
+    };
+    var linea = function (label, key, color, dash) {
+      return { type: 'line', label: label, data: p.map(function (x) { return x[key]; }), borderColor: color, borderWidth: 1.8,
+        borderDash: dash, pointRadius: 0, pointHoverRadius: 3, tension: .1, fill: false, order: 0 };
+    };
+    return new Chart(canvas, { type: 'bar', data: { labels: p.map(function (x) { return x.d; }), datasets: [
+      linea('MACD', 'macd', t.real), linea('Señal', 'sig', t.hold, [6, 4]),
+      { type: 'bar', label: 'Histograma', data: p.map(function (x) { return x.hist; }), order: 1, barPercentage: 1, categoryPercentage: .9,
+        backgroundColor: p.map(function (x) { return x.hist >= 0 ? t.gain : t.loss; }) }
+    ] }, options: o, plugins: [marcaRec] });
+  }
 
   /* ---------------------------------------------------------------- qué hizo el stop (real - hold) */
   function stopDiff(canvas, list) {
@@ -365,5 +389,5 @@
   }
 
   window.Fmt = Fmt;
-  window.Charts = { mini: mini, detalle: detalle, barras: barras, semanal: semanal, alpha: alpha, tecPrecio: tecPrecio, tecOsc: tecOsc, stopDiff: stopDiff };
+  window.Charts = { mini: mini, detalle: detalle, barras: barras, semanal: semanal, alpha: alpha, tecPrecio: tecPrecio, tecOsc: tecOsc, tecMacd: tecMacd, stopDiff: stopDiff };
 })();

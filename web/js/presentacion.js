@@ -17,7 +17,7 @@
   function mov() { return !reduce && !clasica; }
   var DEFECTO = [
     { tipo: 'portada', titulo: '¿Acertó Danelfin?' }, { tipo: 'danelfin', titulo: 'Qué promete Danelfin' },
-    { tipo: 'metodo', titulo: 'Cómo lo medimos' }, { tipo: 'numeros', titulo: 'Los números' },
+    { tipo: 'numeros', titulo: 'Los números' },
     { tipo: 'dolares', titulo: 'En dólares' }, { tipo: 'semanal', titulo: 'Semana a semana' },
     { tipo: 'stop', titulo: 'Qué hizo el stop' }, { tipo: 'tecnico', titulo: 'La foto técnica' },
     { tipo: 'cierre', titulo: 'Conclusiones' }
@@ -99,11 +99,21 @@
         after: function (el, res) { escena($('.pr-3d', el), 'portada', res); } };
     },
     danelfin: function (s) {
+      var paso3 = function (i, k, t, d) {
+        return '<div class="pr-fl pr-rev" data-paso="' + i + '"><span class="k">' + k + '</span><span class="t">' + t + '</span><span class="d">' + d + '</span></div>';
+      };
       return { html: head(s) + '<div class="pr-tiles">' +
         tile('Puntaje', '1 a 10', 'AI Score: probabilidad de superar al mercado en 3 meses') +
         tile('Acierto histórico que citan', cnt(R.winrateDanelfin, 'pctn'), 'promedio de los boletines, a 3 meses') +
         tile('Retorno histórico que citan', cnt(R.avgretDanelfin, 'pct'), 'promedio de los boletines, a 3 meses') +
-        tile('Probabilidad prometida', cnt(R.probProm, 'pctn'), 'de superar al mercado, promedio') + '</div>' };
+        tile('Probabilidad prometida', cnt(R.probProm, 'pctn'), 'de superar al mercado, promedio') + '</div>' +
+        // Cómo se arma el AI Score, según la propia Danelfin (danelfin.com/how-it-works)
+        '<div class="pr-flujo">' +
+          paso3(0, 'Datos', '<strong>~10.000</strong> variables diarias por acción', 'más de 600 indicadores técnicos, 150 fundamentales y 150 de sentimiento') +
+          paso3(1, 'Señales', 'Las que más <em>alpha</em> dieron', 'aprende de las últimas 252 ruedas en EE. UU.') +
+          paso3(2, 'Modelo', 'Cientos de árboles de decisión', 'promedia la probabilidad de todos y la ajusta por volatilidad') +
+          paso3(3, 'Resultado', 'AI Score <strong>1 a 10</strong>', 'probabilidad de superar al mercado a 3 meses; subpuntajes técnico, fundamental, sentimiento y riesgo bajo') +
+        '</div><p class="pr-fuente">Fuente: Danelfin, «How it works» y centro de ayuda. Metodología declarada por la empresa, sin auditoría independiente.</p>' };
     },
     metodo: function (s) {
       var paso = function (n, t, d) { return '<div class="pr-step pr-rev" data-paso="' + (n - 1) + '"><span class="n">' + n + '</span><h3>' + t + '</h3><p>' + d + '</p></div>'; };
@@ -172,7 +182,7 @@
         '<span><i class="dash" style="border-color:var(--hold)"></i>EMA 50</span><span><i class="dot" style="border-color:var(--spy)"></i>EMA 200</span></div>' +
         '<div class="pr-tec">' + lista.map(function (a, i) {
           var e = A.entradaSnap(a);
-          return '<button type="button" class="pr-tcard pr-rev" data-paso="' + Math.floor(i / 6) + '" data-id="' + esc(a.id) + '" aria-label="' + esc(a.etiqueta) + ': ver el detalle diario">' +
+          return '<button type="button" class="pr-tcard pr-rev" data-paso="' + Math.floor(i / 6) + '" data-id="' + esc(a.id) + '" aria-label="' + esc(a.etiqueta) + ': ver el análisis técnico">' +
             '<span class="tk">' + esc(a.etiqueta) + '</span><span class="mini"><canvas aria-hidden="true"></canvas></span>' +
             '<span class="vals">RSI ' + Fmt.n1(e.rsi) + ' · MFI ' + Fmt.n1(e.mfi) + ' · ADX ' + Fmt.n1(e.adx) +
             '<br>+DI ' + Fmt.n1(e.pdi) + ' / −DI ' + Fmt.n1(e.mdi) + ' · vs EMA 200 ' + Fmt.pct(e.cierre / e.ema200 - 1, 1) + '</span></button>';
@@ -347,7 +357,7 @@
   root.addEventListener('cancel', function () { terminar(); });
   root.addEventListener('close', function () { if (!root.open) terminar(); });
   root.addEventListener('keydown', function (e) {
-    if (A.detalle && A.detalle.open) return;
+    if ((A.detalle && A.detalle.open) || (tdlg && tdlg.open)) return;
     var k = e.key;
     if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); siguiente(); }
     else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); anterior(); }
@@ -362,7 +372,9 @@
     }
   });
   root.addEventListener('click', function (e) {
-    var c = e.target.closest('.pr-card, .pr-tcard');
+    var tc = e.target.closest('.pr-tcard');
+    if (tc) { abrirTecnico(tc.getAttribute('data-id')); return; }
+    var c = e.target.closest('.pr-card');
     if (c) { A.openDetail(c.getAttribute('data-id')); return; }
     if (e.target.closest('.pr-prev')) anterior();
     else if (e.target.closest('.pr-next')) siguiente();
@@ -372,6 +384,43 @@
     else if (e.target.closest('.pr-n-reset')) { t0 = Date.now(); reloj(); }
   });
   if (A.detalle) A.detalle.addEventListener('close', function () { if (root.open) root.focus(); });
+
+  /* ---------------------------------------------------------------- ventana técnica (foto técnica) */
+  // Precio con EMAs y los osciladores ya desplegados (RSI/MFI, ADX ±DI, MACD), antes y después de la recomendación.
+  var tdlg = document.getElementById('tecnico-dlg'), tCharts = [];
+  function cerrarTecnico() { tCharts.forEach(function (c) { if (c) c.destroy(); }); tCharts = []; }
+  function abrirTecnico(id) {
+    var a = A.byId(id); if (!a || !tdlg) return;
+    var e = A.entradaSnap(a) || {};
+    var v = function (k, x) { return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + x + '</div></div>'; };
+    var leg = function (items) { return '<div class="legend">' + items.map(function (i) {
+      return '<span><i class="' + (i[2] || '') + '" style="border-color:' + i[1] + '"></i>' + i[0] + '</span>'; }).join('') + '</div>'; };
+    var cv = function (cls, label) { return '<div class="tec-chart ' + cls + '"><canvas role="img" aria-label="' + esc(label) + '"></canvas></div>'; };
+    $('#tec-titulo', tdlg).textContent = a.etiqueta + ' · ' + a.empresa;
+    $('#tec-sub', tdlg).textContent = 'Recomendada el ' + Fmt.date(a.fechaRec) + ' · valores al cierre previo a la entrada · gráficos hasta el ' + Fmt.date(D.meta.corte);
+    $('#tec-cuerpo', tdlg).innerHTML =
+      '<div class="dlg-stats tec-stats">' + v('Cierre', Fmt.n2(e.cierre)) + v('vs EMA 200', Fmt.pct(e.cierre / e.ema200 - 1, 1)) +
+        v('RSI', Fmt.n1(e.rsi)) + v('MFI', Fmt.n1(e.mfi)) + v('ADX', Fmt.n1(e.adx)) + v('+DI / −DI', Fmt.n1(e.pdi) + ' / ' + Fmt.n1(e.mdi)) +
+        v('MACD / señal', Fmt.n2(e.macd) + ' / ' + Fmt.n2(e.senal)) + v('Resultado real', A.gl(a.real)) + '</div>' +
+      leg([['Cierre', 'var(--ink)'], ['EMA 20', 'var(--real)'], ['EMA 50', 'var(--hold)', 'dash'], ['EMA 200', 'var(--spy)', 'dot']]) +
+      cv('tec-precio', 'Precio y medias de ' + a.ticker) +
+      '<div class="tec-oscs">' +
+        '<div>' + leg([['RSI', 'var(--real)'], ['MFI', 'var(--hold)', 'dash']]) + cv('tec-osc', 'RSI y MFI de ' + a.ticker) + '</div>' +
+        '<div>' + leg([['ADX', 'var(--ink)'], ['+DI', 'var(--gain)'], ['−DI', 'var(--loss)', 'dash']]) + cv('tec-osc', 'ADX, +DI y −DI de ' + a.ticker) + '</div>' +
+        '<div>' + leg([['MACD', 'var(--real)'], ['Señal', 'var(--hold)', 'dash'], ['Histograma', 'var(--gain)']]) + cv('tec-osc', 'MACD de ' + a.ticker) + '</div>' +
+      '</div>';
+    cerrarTecnico();
+    if (typeof tdlg.showModal === 'function') tdlg.showModal(); else tdlg.setAttribute('open', '');
+    var cvs = $$('canvas', tdlg);
+    tCharts.push(Charts.tecPrecio(cvs[0], a));
+    Charts.tecOsc(cvs[1], cvs[2], a).forEach(function (c) { tCharts.push(c); });
+    tCharts.push(Charts.tecMacd(cvs[3], a));
+  }
+  if (tdlg) {
+    tdlg.addEventListener('close', function () { cerrarTecnico(); if (root.open) root.focus(); });
+    $('#tec-cerrar', tdlg).addEventListener('click', function () { tdlg.close(); });
+    tdlg.addEventListener('click', function (e) { if (e.target === tdlg) tdlg.close(); });
+  }
 
   var btn = document.getElementById('presentar');
   if (btn) btn.addEventListener('click', function () { abrir(0, true); });

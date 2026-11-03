@@ -15,6 +15,17 @@ Danelfin es una plataforma de análisis de acciones basada en inteligencia artif
 - **Cobertura:** acciones y ETF de EE. UU. y las empresas del índice STOXX Europe 600 [1][2].
 - **Idea de la semana (*Trade Idea of the Week*):** cada semana el boletín destaca una acción con score de compra (BUY) cuyas señales de compra pasadas tuvieron una tasa de acierto de 70% o más a 3 meses desde 2017. Cada mail trae además parámetros sugeridos: precio de entrada, horizonte de 3 meses, **stop loss** y **take profit** (o salida si cambia el AI Score) [mails de Danelfin]. Son esos parámetros los que se siguen en este informe.
 
+## Cómo se arma el AI Score
+
+Según la descripción que publica la propia empresa [6][7]:
+
+- **Datos:** cada día calcula unas 10.000 variables (*features*) por acción, a partir de más de 600 indicadores técnicos, 150 fundamentales y 150 de sentimiento.
+- **Señales:** el modelo busca las que más *alpha* (rendimiento por encima del mercado) generaron en el pasado reciente: las últimas 252 ruedas para acciones de EE. UU. y 500 para Europa. Danelfin las llama *alpha signals*.
+- **Modelo:** esas señales alimentan un conjunto de árboles de decisión. Una página habla de 500 árboles y otra de "cientos". La probabilidad de la acción es el promedio de la de todos los árboles y, en EE. UU., se ajusta por la volatilidad de la acción.
+- **Resultado:** esa probabilidad de superar al índice de referencia en 3 meses se traduce al AI Score de 1 a 10. La plataforma también muestra cuatro subpuntajes de 1 a 10 (técnico, fundamental, sentimiento y riesgo bajo) y qué señales suman o restan en cada caso.
+
+Es la metodología declarada por Danelfin. No hay una auditoría independiente del modelo y la empresa no detalla cómo calcula el subpuntaje de riesgo bajo.
+
 ## Historia
 
 - **2016:** se funda la empresa Danel Capital, que opera como Danelfin, con sede en Barcelona (España) [3]. Los fundadores son Tomás Diago (CEO), Aarón Román (científico de datos jefe) y Guillermo Salas (CTO) [1].
@@ -35,3 +46,5 @@ Danelfin comunica que las acciones con AI Score 10 superaron al S&P 500 en prome
 3. Descripciones de la plataforma en directorios y reseñas (por ejemplo, [CB Insights](https://www.cbinsights.com/company/danelfin)), usadas solo para confirmar el concepto del AI Score de 1 a 10.
 4. Reseñas externas, por ejemplo [Pineify, «Danelfin Review»](https://pineify.app/danelfin/danelfin-review); no verificado contra los documentos de Danelfin.
 5. Boletín *Trade Idea of the Week* de Danelfin AI (boletines de julio a septiembre de 2026).
+6. Danelfin, [«How it Works»](https://danelfin.com/how-it-works) e [infografía](https://danelfin.com/how-it-works/infographic), consultadas el 02/11/2026.
+7. Centro de ayuda de Danelfin, [«What is the AI Score? How it rates stocks and ETFs?»](https://support.danelfin.com/hc/en-us/articles/4404382038545-What-is-the-AI-Score-How-it-rates-stocks-and-ETFs), consultado el 02/11/2026.

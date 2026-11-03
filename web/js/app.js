@@ -260,11 +260,13 @@
           v('RSI', Fmt.n1(s.rsi)) + v('MFI', Fmt.n1(s.mfi)) + v('ADX', Fmt.n1(s.adx)) + v('+DI / −DI', Fmt.n1(s.pdi) + ' / ' + Fmt.n1(s.mdi)) +
           v('MACD', Fmt.n2(s.macd)) + v('Señal', Fmt.n2(s.senal)) + v('Histograma', Fmt.n2(s.hist)) + v('Resultado real', gl(a.real)) +
         '</div>' +
-        '<details class="tec-osc"><summary>Ver osciladores (RSI, MFI, ADX y DI)</summary>' +
+        '<details class="tec-osc"><summary>Ver osciladores (RSI, MFI, ADX, DI y MACD)</summary>' +
           '<div class="legend"><span><i style="border-color:var(--real)"></i>RSI</span><span><i class="dash" style="border-color:var(--hold)"></i>MFI</span></div>' +
           '<div class="tec-chart sm"><canvas role="img" aria-label="RSI y MFI de ' + esc(a.ticker) + '"></canvas></div>' +
           '<div class="legend"><span><i style="border-color:var(--ink)"></i>ADX</span><span><i style="border-color:var(--gain)"></i>+DI</span><span><i class="dash" style="border-color:var(--loss)"></i>−DI</span></div>' +
           '<div class="tec-chart sm"><canvas role="img" aria-label="ADX, +DI y −DI de ' + esc(a.ticker) + '"></canvas></div>' +
+          '<div class="legend"><span><i style="border-color:var(--real)"></i>MACD</span><span><i class="dash" style="border-color:var(--hold)"></i>Señal</span><span><i style="border-color:var(--gain)"></i>Histograma</span></div>' +
+          '<div class="tec-chart sm"><canvas role="img" aria-label="MACD de ' + esc(a.ticker) + '"></canvas></div>' +
         '</details></article>';
     });
     host.innerHTML = h ? '<div class="legend"><span><i style="border-color:var(--ink)"></i>Cierre</span><span><i style="border-color:var(--real)"></i>EMA 20</span>' +
@@ -278,6 +280,7 @@
         if (det.open && !det._dibujado) {
           var cvs = $$('canvas', det);
           Charts.tecOsc(cvs[0], cvs[1], a).forEach(function (x) { tecCharts.push(x); });
+          tecCharts.push(Charts.tecMacd(cvs[2], a));
           det._dibujado = true;
         }
       });

@@ -460,3 +460,28 @@ html.presentando { font-size: clamp(18px, 1.2vw, 26px); }
 .pr-modo-clasica .pr-3d-portada { display: none; }
 .pr-modo-clasica .pr-3d-resultados { height: auto; }
 .pr-modo { min-width: 52px; font-size: .85rem; }
+
+/* ventana técnica del modo presentación */
+.dlg-tec { width: min(1500px, 96vw); max-height: 96vh; }
+.dlg-tec .dlg-body { gap: .6rem; }
+.dlg-tec .tec-stats { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .6rem; }
+.dlg-tec .tec-chart { position: relative; }
+.dlg-tec .tec-precio { height: 31vh; }
+.dlg-tec .tec-oscs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.dlg-tec .tec-osc { height: 20vh; }
+@media (max-width: 1000px) { .dlg-tec .tec-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } .dlg-tec .tec-oscs { grid-template-columns: 1fr; } }
+
+/* cómo se arma el AI Score */
+.pr-danelfin .pr-tiles { margin-bottom: 1rem; }
+.pr-danelfin .pr-tile { padding-top: .8rem; padding-bottom: .8rem; }
+.pr-danelfin .pr-tile .v { font-size: clamp(1.8rem, 3.6vw, 3.2rem); }
+.pr-flujo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.6rem; position: relative; }
+.pr-fl { position: relative; display: grid; gap: .3rem; align-content: start; padding: .9rem 1rem; border-radius: var(--r);
+  background: rgba(20, 30, 52, .78); border: 1px solid rgba(127,169,255,.16); border-top: 3px solid var(--real); }
+.pr-fl:not(:last-child)::after { content: "→"; position: absolute; right: -1.25rem; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 1.2rem; }
+.pr-fl:last-child { border-top-color: var(--hold); }
+.pr-fl .k { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); font-weight: 700; }
+.pr-fl .t { font-family: var(--serif); font-size: clamp(1.05rem, 1.6vw, 1.35rem); line-height: 1.25; }
+.pr-fl .d { font-size: .82rem; color: var(--ink-2); line-height: 1.4; }
+.pr-fuente { font-size: .75rem; color: var(--ink-3); margin: .7rem 0 0; }
+@media (max-width: 1000px) { .pr-flujo { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pr-fl::after { display: none; } }
