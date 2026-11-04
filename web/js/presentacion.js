@@ -62,7 +62,7 @@
   function tarjetas(lista, textos) {
     if (!lista.length) return '<p class="pr-vacio">No hay recomendaciones en este grupo.</p>';
     return '<div class="pr-cards n' + Math.min(lista.length, 5) + '">' + lista.map(function (a, i) {
-      return '<button type="button" class="pr-card pr-rev" data-paso="' + i + '" data-id="' + esc(a.id) + '" aria-label="' + esc(a.etiqueta) + ': ver el detalle diario">' +
+      return '<button type="button" class="pr-card pr-rev" data-paso="' + i + '" data-id="' + esc(a.id) + '" aria-label="' + esc(a.etiqueta) + ': ver la ficha y el detalle">' +
         '<span class="top"><span class="tk">' + esc(a.etiqueta) + '</span><span class="co">' + esc(a.empresa) + '</span></span>' +
         A.badge(a) +
         '<span class="nums"><span class="big">' + A.gl(a.real) + '</span><span class="hold">hold ' + A.gl(a.hold) + '</span></span>' +
@@ -378,6 +378,7 @@
     var tc = e.target.closest('.pr-tcard');
     if (tc) { abrirTecnico(tc.getAttribute('data-id')); return; }
     var c = e.target.closest('.pr-card');
+    if (c && c.closest('.pr-empresas')) { abrirFicha(c.getAttribute('data-id')); return; }   // diapositivas por tema
     if (c) { A.openDetail(c.getAttribute('data-id')); return; }
     if (e.target.closest('.pr-prev')) anterior();
     else if (e.target.closest('.pr-next')) siguiente();
@@ -413,14 +414,37 @@
         '<div>' + leg([['MACD', 'var(--real)'], ['Señal', 'var(--hold)', 'dash'], ['Histograma', 'var(--gain)']]) + cv('tec-osc', 'MACD de ' + a.ticker) + '</div>' +
       '</div>';
     cerrarTecnico();
+    tdlg.classList.remove('dlg-ficha');
     if (typeof tdlg.showModal === 'function') tdlg.showModal(); else tdlg.setAttribute('open', '');
     var cvs = $$('canvas', tdlg);
     tCharts.push(Charts.tecPrecio(cvs[0], a));
     Charts.tecOsc(cvs[1], cvs[2], a).forEach(function (c) { tCharts.push(c); });
     tCharts.push(Charts.tecMacd(cvs[3], a));
   }
+  // Ficha resumida de la empresa (diapositivas por tema): a qué se dedica y cómo le fue, con sus niveles y el gráfico diario.
+  function abrirFicha(id) {
+    var a = A.byId(id); if (!a || !tdlg) return;
+    var f = (D.contenido && D.contenido.empresas && D.contenido.empresas.fichas[a.ticker]) || {};
+    var quien = (f.cuerpo || '').split(/\n\s*\n/).filter(function (p) { return /^\*\*Quién es/.test(p.trim()); })[0] || '';
+    var v = function (k, x) { return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + x + '</div></div>'; };
+    var sal = a.salida && a.salida.fecha ? (a.salida.motivo === 'SL' ? 'Stop el ' : 'Take profit el ') + Fmt.dm(a.salida.fecha) : 'Sigue abierta';
+    $('#tec-titulo', tdlg).textContent = a.etiqueta + ' · ' + a.empresa;
+    $('#tec-sub', tdlg).textContent = 'Recomendada el ' + Fmt.date(a.fechaRec) + ' · AI Score ' + a.score + '/10 · datos al ' + Fmt.date(D.meta.corte);
+    $('#tec-cuerpo', tdlg).innerHTML =
+      (f.bajada ? '<p class="ficha-bajada">' + esc(f.bajada) + '</p>' : '') +
+      (quien && window.marked ? '<div class="prose ficha-quien">' + marked.parse(quien) + '</div>' : '') +
+      '<div class="dlg-stats ficha-stats">' + v('Entrada', Fmt.n2(a.entrada)) + v('Stop loss', Fmt.n2(a.sl)) + v('Take profit', Fmt.n2(a.tp)) +
+        v('Salida', sal) + v('Real', A.gl(a.real)) + v('Hold', A.gl(a.hold)) + v('S&amp;P 500, mismo período', A.gl(a.spyHold)) + '</div>' +
+      '<div class="tec-chart ficha-chart"><canvas role="img" aria-label="Precio diario de ' + esc(a.ticker) + ' con entrada, stop loss y take profit"></canvas></div>' +
+      '<p class="small"><button type="button" class="linkbtn" id="ficha-detalle">Ver el detalle diario completo</button></p>';
+    cerrarTecnico();
+    tdlg.classList.add('dlg-ficha');
+    if (typeof tdlg.showModal === 'function') tdlg.showModal(); else tdlg.setAttribute('open', '');
+    if (a.serie && a.serie.length) tCharts.push(Charts.detalle($('canvas', tdlg), a));
+    $('#ficha-detalle', tdlg).addEventListener('click', function () { tdlg.close(); A.openDetail(a.id); });
+  }
   if (tdlg) {
-    tdlg.addEventListener('close', function () { cerrarTecnico(); if (root.open) root.focus(); });
+    tdlg.addEventListener('close', function () { cerrarTecnico(); tdlg.classList.remove('dlg-ficha'); if (root.open) root.focus(); });
     $('#tec-cerrar', tdlg).addEventListener('click', function () { tdlg.close(); });
     tdlg.addEventListener('click', function (e) { if (e.target === tdlg) tdlg.close(); });
   }

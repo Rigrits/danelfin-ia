@@ -132,7 +132,7 @@ bajada: Titanio y aleaciones de níquel para aviones y defensa, competidora de C
 
 ## AER · AerCap
 
-bajada: El mayor arrendador de aviones del mundo. Es una de las dos recomendaciones en positivo (+9%): la falta de aviones nuevos y de motores sube los alquileres, y la empresa tuvo un trimestre récord.
+bajada: El mayor arrendador de aviones del mundo. Nunca tocó el stop y al 23/10 estaba apenas en positivo (+0,3%), por encima del S&P 500: la falta de aviones nuevos y de motores sube los alquileres.
 
 **Quién es.** AerCap, con sede en Dublín (Irlanda), es la mayor empresa de **arrendamiento de aviones** del mundo. Compra aviones y motores y los alquila a aerolíneas por plazos largos, y gana además vendiendo aviones usados. Su negocio se beneficia cuando escasean los aviones nuevos, porque las aerolíneas pagan más por alquilar los existentes.
 
@@ -160,7 +160,7 @@ bajada: Una de las mayores mineras de oro del mundo. Recibió el puntaje máximo
 
 ## AAPL · Apple
 
-bajada: La empresa más conocida de la lista, con nuevo CEO desde septiembre. Sigue abierta y en positivo (+2,5%), muy cerca del S&P 500; el 2 de noviembre presenta resultados.
+bajada: La empresa más conocida de la lista, con nuevo CEO desde septiembre. Sigue abierta y al 23/10 era la de mejor resultado (+3,4%), por encima del S&P 500.
 
 **Quién es.** Apple diseña el iPhone, la Mac, el iPad, el Apple Watch y servicios como la App Store, iCloud y Apple Music. El iPhone es cerca de la mitad de sus ingresos, y los **servicios** son su negocio de mayor margen. Es una de las empresas más grandes del mundo por valor de mercado, y por eso su acción suele moverse parecido al índice.
 
