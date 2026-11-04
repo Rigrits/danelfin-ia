@@ -144,7 +144,7 @@ idea: Qué nos deja el seguimiento.
 punto: La inteligencia artificial no acertó en este período: pocas recomendaciones terminaron en positivo y casi ninguna superó al mercado.
 punto: La disciplina del stop limitó el daño: sin él, la pérdida habría sido mucho mayor.
 punto: Las noticias pesan más que la predicción: la guerra, las tasas y las dudas sobre la IA cambiaron el rumbo de las acciones, más allá de lo que anticipaba el modelo.
-punto: Es un trimestre con un contexto muy particular y una muestra acotada: describe lo que pasó, no predice lo que vendrá.
+punto: La lectura técnica de las recomendaciones fue deficiente: varias llegaron con subas agotadas o tendencias bajistas ya visibles en los indicadores.
 
 - Invitar a explorar la web completa y descargar el Excel.
 - Abrir preguntas.
