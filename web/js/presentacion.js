@@ -201,8 +201,7 @@
       var concl = D.contenido && D.contenido.conclusiones;
       return { html: head(s) + '<ul class="pr-points">' + (s.punto || []).map(function (p, i) { return '<li class="pr-rev" data-paso="' + i + '">' + esc(p) + '</li>'; }).join('') + '</ul>' +
         (concl && window.marked ? '<div class="pr-concl prose">' + marked.parse(concl) + '</div>' : '') +
-        '<p class="pr-meta">Informe completo y Excel descargable: <a href="' + esc(url) + '">' + esc(url.replace(/^https?:\/\//, '')) + '</a></p>' +
-        '<p class="pr-legal">Seguimiento independiente, sin afiliación con Danelfin. No constituye asesoramiento ni recomendación de inversión; rendimientos pasados no garantizan resultados futuros.</p>' };
+        '<p class="pr-meta">Informe completo y Excel descargable: <a href="' + esc(url) + '">' + esc(url.replace(/^https?:\/\//, '')) + '</a></p>' };
     }
   };
   var CLAVE = { portada: 1, numeros: 1, dolares: 1, cierre: 1 };    // momentos con entrada más vistosa

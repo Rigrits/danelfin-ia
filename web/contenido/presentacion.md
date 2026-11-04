@@ -143,6 +143,7 @@ titulo: Conclusiones
 idea: Qué nos deja el seguimiento.
 punto: La inteligencia artificial no acertó en este período: pocas recomendaciones terminaron en positivo y casi ninguna superó al mercado.
 punto: La disciplina del stop limitó el daño: sin él, la pérdida habría sido mucho mayor.
+punto: Mirar la evolución técnica antes de entrar habría sumado: en varias recomendaciones los indicadores ya mostraban subas agotadas o tendencias bajistas.
 punto: Es un trimestre con un contexto muy particular y una muestra acotada: describe lo que pasó, no predice lo que vendrá.
 
 - Invitar a explorar la web completa y descargar el Excel.
