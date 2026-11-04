@@ -21,6 +21,8 @@ Un patrón que se repite: **varias empresas presentaron buenos resultados y aun 
 ## MTZ · MasTec
 
 bajada: Constructora de infraestructura (energía, telecomunicaciones, ductos). Tocó el stop a los diez días; después cayó otro 18% en un día con resultados "en línea" que decepcionaron. Sin el stop, la pérdida habría sido de 50%.
+rubro: Construye redes eléctricas, de telecomunicaciones y ductos.
+motivo: Cayó tras resultados que no entusiasmaron, en plena duda sobre la inversión en IA.
 
 **Quién es.** MasTec es una empresa estadounidense de ingeniería y construcción de infraestructura, con sede en Florida. Construye y mantiene redes eléctricas y de transmisión, infraestructura de telecomunicaciones (fibra y redes móviles), proyectos de energía renovable y ductos. Su negocio depende de los planes de inversión de las eléctricas, las operadoras de telecomunicaciones y las empresas de energía, y se mide por su **cartera de obras pendientes** (*backlog*).
 
@@ -35,6 +37,8 @@ bajada: Constructora de infraestructura (energía, telecomunicaciones, ductos). 
 ## FTI · TechnipFMC
 
 bajada: Tecnología submarina para petróleo y gas. Aguantó más de tres meses dentro de las bandas y tocó el stop recién el 22/10, en la caída general del mercado. Una semana después presentó resultados récord y bajó igual.
+rubro: Equipos submarinos para extraer petróleo y gas.
+motivo: Aguantó tres meses; la sacó la caída general del 22/10 y al día siguiente rebotó.
 
 **Quién es.** TechnipFMC es una empresa de tecnología y servicios para la industria energética, con operaciones en EE. UU. y Europa. Su negocio principal es **submarino** (*subsea*): diseña, fabrica e instala los equipos que se colocan en el lecho marino para producir petróleo y gas en aguas profundas. Vende proyectos integrados de largo plazo, por lo que sus pedidos (*inbound orders*) anticipan los ingresos futuros.
 
@@ -49,6 +53,8 @@ bajada: Tecnología submarina para petróleo y gas. Aguantó más de tres meses 
 ## VRT · Vertiv
 
 bajada: Fabrica equipos de energía y refrigeración para centros de datos de IA. Tocó el stop a los nueve días, al caer 17% por facturar menos de lo esperado. En octubre subió 16% en un día con pedidos duplicados, cuando ya estaba fuera.
+rubro: Energía y refrigeración para centros de datos.
+motivo: Facturó menos de lo esperado justo cuando crecían las dudas sobre la IA.
 
 **Quién es.** Vertiv es una empresa estadounidense con sede en Ohio, que se separó de Emerson Electric. Provee la "infraestructura crítica" de los centros de datos: sistemas de energía ininterrumpida, distribución eléctrica y refrigeración, incluida la refrigeración líquida que exigen los servidores de IA. Es una de las acciones más asociadas a la construcción de centros de datos para inteligencia artificial.
 
@@ -63,6 +69,8 @@ bajada: Fabrica equipos de energía y refrigeración para centros de datos de IA
 ## CRS · Carpenter Technology
 
 bajada: Aleaciones especiales para aviones y defensa. Tocó el stop a los dos días con resultados récord que no alcanzaron. En octubre cayó 20,6% en un día: es la peor acción si no se hubiera vendido (−53%).
+rubro: Aleaciones especiales para aviones y defensa.
+motivo: Resultados récord que no alcanzaron: venía de subir mucho y cayó en dos días.
 
 **Quién es.** Carpenter Technology es una empresa estadounidense con sede en Pensilvania que produce **aleaciones especiales** de alto rendimiento: superaleaciones de níquel, titanio y aceros especiales. Sus principales clientes son la industria aeroespacial (motores y estructuras de aviones), defensa, medicina y energía. Fue una de las grandes ganadoras del ciclo de recuperación de la aviación.
 
@@ -77,6 +85,8 @@ bajada: Aleaciones especiales para aviones y defensa. Tocó el stop a los dos d�
 ## CASY · Casey's General Stores
 
 bajada: Cadena de tiendas de conveniencia y estaciones de servicio del medio oeste de EE. UU. Tocó el stop a los tres días; un mes después cayó 14% con ganancias +28%, porque no subió su pronóstico.
+rubro: Tiendas de conveniencia y estaciones de servicio.
+motivo: El mercado castigó que no subiera su pronóstico de ganancias.
 
 **Quién es.** Casey's es una cadena estadounidense de tiendas de conveniencia con sede en Iowa, presente sobre todo en pueblos y ciudades medianas del medio oeste. Vende combustible, pero gana sobre todo con lo que vende **dentro de la tienda**, en especial comida preparada: es conocida por su pizza. Crece abriendo tiendas y comprando cadenas regionales. Por eso se la ve como una empresa defensiva y de crecimiento estable, muy distinta del resto de la lista.
 
@@ -91,6 +101,8 @@ bajada: Cadena de tiendas de conveniencia y estaciones de servicio del medio oes
 ## GEV · GE Vernova
 
 bajada: Turbinas a gas, energía eólica y redes eléctricas, separada de General Electric en 2024. Tocó el stop en la ola de dudas sobre la IA; sus resultados son buenos, pero el negocio eólico sigue perdiendo plata.
+rubro: Turbinas, energía eólica y redes eléctricas.
+motivo: Buenos resultados, pero arrastrada por las dudas sobre la IA.
 
 **Quién es.** GE Vernova es la ex división de energía de General Electric, que cotiza por separado desde abril de 2024. Tiene tres negocios: **energía** (turbinas a gas, nuclear e hidro), **eólica** (terrestre y marina) y **electrificación** (redes, transformadores y software). Se volvió una de las acciones estrella de la "demanda eléctrica de la IA", porque los centros de datos necesitan generación nueva y redes más grandes. Su cartera de pedidos ronda los US$ 176.000 millones. [Motley Fool](https://fool.com/investing/2026/10/31/stock-split-watch-ge-vernova-trades-above-890)
 
@@ -105,6 +117,8 @@ bajada: Turbinas a gas, energía eólica y redes eléctricas, separada de Genera
 ## RTX · RTX Corp
 
 bajada: Gigante aeroespacial y de defensa (Pratt & Whitney, Collins, Raytheon). Tocó el stop por problemas con los motores de Pratt & Whitney y el petróleo caro que golpea a las aerolíneas. En octubre presentó resultados récord, sin recuperar la entrada.
+rubro: Motores, sistemas aeroespaciales y defensa.
+motivo: Problemas en sus motores y petróleo caro para las aerolíneas.
 
 **Quién es.** RTX, ex Raytheon Technologies, es uno de los mayores grupos aeroespaciales y de defensa del mundo, con sede en Virginia. Tiene tres negocios: **Collins Aerospace** (sistemas y componentes de aviones), **Pratt & Whitney** (motores, incluido el GTF que usan muchos Airbus A320neo) y **Raytheon** (misiles y sistemas de defensa). Combina un negocio comercial ligado a las aerolíneas con uno de defensa ligado al gasto militar.
 
@@ -119,6 +133,8 @@ bajada: Gigante aeroespacial y de defensa (Pratt & Whitney, Collins, Raytheon). 
 ## ATI · ATI Inc
 
 bajada: Titanio y aleaciones de níquel para aviones y defensa, competidora de Carpenter. Tocó el stop a las dos semanas y siguió el mismo camino que CRS: resultados fuertes, pero dudas sobre los inventarios de la industria aeroespacial.
+rubro: Titanio y aleaciones para aviones y defensa.
+motivo: Dudas sobre los inventarios de la industria aeroespacial, igual que Carpenter.
 
 **Quién es.** ATI, ex Allegheny Technologies, es una empresa estadounidense con sede en Texas que produce **materiales especiales**: titanio, superaleaciones de níquel y productos forjados para motores y estructuras de aviones, defensa y energía. En los últimos años se reconvirtió para depender casi por completo de clientes aeroespaciales y de defensa.
 
@@ -133,6 +149,8 @@ bajada: Titanio y aleaciones de níquel para aviones y defensa, competidora de C
 ## AER · AerCap
 
 bajada: El mayor arrendador de aviones del mundo. Nunca tocó el stop y al 23/10 estaba apenas en positivo (+0,3%), por encima del S&P 500: la falta de aviones nuevos y de motores sube los alquileres.
+rubro: Alquila aviones a aerolíneas.
+motivo: La falta de aviones nuevos sube los alquileres: nunca tocó el stop.
 
 **Quién es.** AerCap, con sede en Dublín (Irlanda), es la mayor empresa de **arrendamiento de aviones** del mundo. Compra aviones y motores y los alquila a aerolíneas por plazos largos, y gana además vendiendo aviones usados. Su negocio se beneficia cuando escasean los aviones nuevos, porque las aerolíneas pagan más por alquilar los existentes.
 
@@ -147,6 +165,8 @@ bajada: El mayor arrendador de aviones del mundo. Nunca tocó el stop y al 23/10
 ## AU · AngloGold Ashanti
 
 bajada: Una de las mayores mineras de oro del mundo. Recibió el puntaje máximo (10/10) y tocó el stop en dos semanas: el oro bajó con la expectativa de tasas más altas, y la acción, que amplifica al metal, bajó más.
+rubro: Minera de oro.
+motivo: El oro cayó al esperarse tasas más altas, y la minera cayó más.
 
 **Quién es.** AngloGold Ashanti es una de las mayores productoras de **oro** del mundo, con minas en África (Ghana, Tanzania, Guinea y otros países), Australia y América. Nació en Sudáfrica y hoy tiene sede en el Reino Unido, con cotización principal en Nueva York. Como toda minera, su ganancia depende sobre todo del precio del oro: cuando el metal sube, sus márgenes suben más que proporcionalmente, y cuando baja, sufren más.
 
@@ -161,6 +181,8 @@ bajada: Una de las mayores mineras de oro del mundo. Recibió el puntaje máximo
 ## AAPL · Apple
 
 bajada: La empresa más conocida de la lista, con nuevo CEO desde septiembre. Sigue abierta y al 23/10 era la de mejor resultado (+3,4%), por encima del S&P 500.
+rubro: iPhone, Mac y servicios digitales.
+motivo: Estable y cerca del índice, con nuevo CEO desde septiembre.
 
 **Quién es.** Apple diseña el iPhone, la Mac, el iPad, el Apple Watch y servicios como la App Store, iCloud y Apple Music. El iPhone es cerca de la mitad de sus ingresos, y los **servicios** son su negocio de mayor margen. Es una de las empresas más grandes del mundo por valor de mercado, y por eso su acción suele moverse parecido al índice.
 
@@ -175,6 +197,8 @@ bajada: La empresa más conocida de la lista, con nuevo CEO desde septiembre. Si
 ## PH · Parker-Hannifin
 
 bajada: Fabricante industrial de sistemas de movimiento y control y componentes aeroespaciales. Fue la última recomendación y tocó el stop el 22/10, en la caída general, con dudas sobre su valuación.
+rubro: Componentes industriales y aeroespaciales.
+motivo: Dudas sobre su valuación; la sacó la caída general del 22/10.
 
 **Quién es.** Parker-Hannifin, con sede en Ohio, es uno de los mayores fabricantes de **tecnologías de movimiento y control**: sistemas hidráulicos, neumáticos, filtración, sellos y componentes para aviones. Tiene dos grandes negocios, uno industrial diversificado (maquinaria, transporte, energía) y uno aeroespacial. Crece en parte comprando empresas, lo que suma deuda.
 

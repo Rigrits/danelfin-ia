@@ -425,14 +425,12 @@
   function abrirFicha(id) {
     var a = A.byId(id); if (!a || !tdlg) return;
     var f = (D.contenido && D.contenido.empresas && D.contenido.empresas.fichas[a.ticker]) || {};
-    var quien = (f.cuerpo || '').split(/\n\s*\n/).filter(function (p) { return /^\*\*Quién es/.test(p.trim()); })[0] || '';
     var v = function (k, x) { return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + x + '</div></div>'; };
     var sal = a.salida && a.salida.fecha ? (a.salida.motivo === 'SL' ? 'Stop el ' : 'Take profit el ') + Fmt.dm(a.salida.fecha) : 'Sigue abierta';
     $('#tec-titulo', tdlg).textContent = a.etiqueta + ' · ' + a.empresa;
     $('#tec-sub', tdlg).textContent = 'Recomendada el ' + Fmt.date(a.fechaRec) + ' · AI Score ' + a.score + '/10 · datos al ' + Fmt.date(D.meta.corte);
     $('#tec-cuerpo', tdlg).innerHTML =
-      (f.bajada ? '<p class="ficha-bajada">' + esc(f.bajada) + '</p>' : '') +
-      (quien && window.marked ? '<div class="prose ficha-quien">' + marked.parse(quien) + '</div>' : '') +
+      '<p class="ficha-bajada"><strong>' + esc(f.rubro || '') + '</strong>' + (f.motivo ? ' ' + esc(f.motivo) : '') + '</p>' +
       '<div class="dlg-stats ficha-stats">' + v('Entrada', Fmt.n2(a.entrada)) + v('Stop loss', Fmt.n2(a.sl)) + v('Take profit', Fmt.n2(a.tp)) +
         v('Salida', sal) + v('Real', A.gl(a.real)) + v('Hold', A.gl(a.hold)) + v('S&amp;P 500, mismo período', A.gl(a.spyHold)) + '</div>' +
       '<div class="tec-chart ficha-chart"><canvas role="img" aria-label="Precio diario de ' + esc(a.ticker) + ' con entrada, stop loss y take profit"></canvas></div>' +

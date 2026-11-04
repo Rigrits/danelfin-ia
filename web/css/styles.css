@@ -503,5 +503,5 @@ html.presentando { font-size: clamp(18px, 1.2vw, 26px); }
 .ficha-quien { color: var(--ink-2); font-size: .92rem; line-height: 1.5; }
 .ficha-quien p { margin: 0; }
 .dlg-tec .ficha-stats { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .6rem; }
-.dlg-tec .ficha-chart { height: 23vh; }
+.dlg-tec .ficha-chart { height: 40vh; }
 @media (max-width: 1000px) { .dlg-tec .ficha-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

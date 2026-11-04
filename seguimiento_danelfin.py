@@ -911,10 +911,17 @@ def _leer_empresas(path: Path) -> dict | None:
     for parte in re.split(r"^## +", t, flags=re.M)[1:]:
         titulo, _, cuerpo = parte.partition("\n")
         titulo, cuerpo, bajada = titulo.strip(), cuerpo.strip(), None
-        if cuerpo.lower().startswith("bajada:"):
+        extra = {}
+        # primeras líneas "clave: valor": bajada (texto de la web), rubro y motivo (ficha corta de la presentación)
+        while re.match(r"(bajada|rubro|motivo):", cuerpo, flags=re.I):
             primera, _, cuerpo = cuerpo.partition("\n")
-            bajada = primera.split(":", 1)[1].strip()
-        item = dict(titulo=titulo, bajada=bajada, cuerpo=cuerpo.strip())
+            cuerpo = cuerpo.strip()
+            k, v = primera.split(":", 1)
+            if k.strip().lower() == "bajada":
+                bajada = v.strip()
+            else:
+                extra[k.strip().lower()] = v.strip()
+        item = dict(titulo=titulo, bajada=bajada, cuerpo=cuerpo.strip(), **extra)
         tk = re.match(r"([A-Z][A-Z.\-]*)\s*·", titulo)
         if tk:
             out["fichas"][tk.group(1)] = item
