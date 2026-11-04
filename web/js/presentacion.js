@@ -431,6 +431,7 @@
     $('#tec-sub', tdlg).textContent = 'Recomendada el ' + Fmt.date(a.fechaRec) + ' · AI Score ' + a.score + '/10 · datos al ' + Fmt.date(D.meta.corte);
     $('#tec-cuerpo', tdlg).innerHTML =
       '<p class="ficha-bajada"><strong>' + esc(f.rubro || '') + '</strong>' + (f.motivo ? ' ' + esc(f.motivo) : '') + '</p>' +
+      (f.cuerpo && window.marked ? '<details class="ficha-mas"><summary>Leer la ficha completa</summary><div class="prose">' + marked.parse(f.cuerpo) + '</div></details>' : '') +
       '<div class="dlg-stats ficha-stats">' + v('Entrada', Fmt.n2(a.entrada)) + v('Stop loss', Fmt.n2(a.sl)) + v('Take profit', Fmt.n2(a.tp)) +
         v('Salida', sal) + v('Real', A.gl(a.real)) + v('Hold', A.gl(a.hold)) + v('S&amp;P 500, mismo período', A.gl(a.spyHold)) + '</div>' +
       '<div class="tec-chart ficha-chart"><canvas role="img" aria-label="Precio diario de ' + esc(a.ticker) + ' con entrada, stop loss y take profit"></canvas></div>' +
